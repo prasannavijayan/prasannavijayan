@@ -84,6 +84,7 @@ export default function App() {
         onSelectLevel={handleSelectLevel}
         onSignOut={signOut}
         userEmail={user.email ?? undefined}
+        currentLevel={effectiveLevel ?? 1}
       />
     );
   }

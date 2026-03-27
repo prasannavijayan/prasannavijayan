@@ -26,7 +26,15 @@ export function checkWin(
   path: Position[],
   gridSize: number,
   totalDots: number,
-  nextRequiredDot: number
+  nextRequiredDot: number,
+  dots: Dot[]
 ): boolean {
-  return path.length === gridSize * gridSize && nextRequiredDot > totalDots;
+  if (path.length !== gridSize * gridSize) return false;
+  if (nextRequiredDot <= totalDots) return false;
+
+  // Path must end on the last numbered dot
+  const lastDot = dots.find((d) => d.number === totalDots);
+  if (!lastDot) return false;
+  const lastPos = path[path.length - 1];
+  return lastPos.row === lastDot.row && lastPos.col === lastDot.col;
 }

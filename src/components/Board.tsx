@@ -1,7 +1,14 @@
-import { useRef, type PointerEvent } from "react";
+import { useEffect, useRef, type PointerEvent } from "react";
 import type { Position, GameAction, GameState } from "@/types";
 import { posKey, buildPathSet, getDotAt } from "@/utils/validation";
 import { Cell } from "@/components/Cell";
+
+const ARROW_DELTAS: Record<string, Position> = {
+  ArrowUp: { row: -1, col: 0 },
+  ArrowDown: { row: 1, col: 0 },
+  ArrowLeft: { row: 0, col: -1 },
+  ArrowRight: { row: 0, col: 1 },
+};
 
 type BoardProps = {
   state: GameState;
@@ -77,6 +84,48 @@ export function Board({ state, dispatch }: BoardProps) {
     dispatch({ type: "END_DRAG" });
   }
 
+  // Keyboard arrow key support
+  useEffect(() => {
+    function handleKeyDown(e: KeyboardEvent) {
+      if (isComplete) return;
+      const delta = ARROW_DELTAS[e.key];
+      if (!delta) return;
+      e.preventDefault();
+
+      if (path.length === 0) {
+        // Auto-start from dot 1
+        const dot1 = dots.find((d) => d.number === 1);
+        if (dot1) {
+          dispatch({ type: "START_DRAG", position: { row: dot1.row, col: dot1.col } });
+        }
+        return;
+      }
+
+      const tail = path[path.length - 1];
+      const target: Position = {
+        row: tail.row + delta.row,
+        col: tail.col + delta.col,
+      };
+
+      // Out of bounds
+      if (target.row < 0 || target.row >= gridSize || target.col < 0 || target.col >= gridSize) return;
+
+      // Check if retracting (moving back to second-to-last cell)
+      if (path.length >= 2) {
+        const prev = path[path.length - 2];
+        if (prev.row === target.row && prev.col === target.col) {
+          dispatch({ type: "RETRACT_PATH", position: target });
+          return;
+        }
+      }
+
+      dispatch({ type: "EXTEND_PATH", position: target });
+    }
+
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, [path, isComplete, gridSize, dots, dispatch]);
+
   // Build grid cells
   const cells = [];
   for (let row = 0; row < gridSize; row++) {
@@ -139,7 +188,7 @@ export function Board({ state, dispatch }: BoardProps) {
       style={{
         display: "grid",
         gridTemplateColumns: `repeat(${gridSize}, 1fr)`,
-        gap: "2px",
+        gap: "1px",
       }}
       onPointerDown={handlePointerDown}
       onPointerMove={handlePointerMove}

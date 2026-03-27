@@ -25,50 +25,69 @@ export function Cell({
 }: CellProps) {
   const hasConnector = connectTop || connectBottom || connectLeft || connectRight;
 
+  // Determine border radius: round only the exposed (non-connected) corners
+  const tl = !connectTop && !connectLeft ? "6px" : "0";
+  const tr = !connectTop && !connectRight ? "6px" : "0";
+  const bl = !connectBottom && !connectLeft ? "6px" : "0";
+  const br = !connectBottom && !connectRight ? "6px" : "0";
+  const borderRadius = `${tl} ${tr} ${br} ${bl}`;
+
   return (
-    <div
-      className={`
-        relative flex items-center justify-center aspect-square
-        rounded-sm border border-slate-700/50 transition-colors duration-100
-        ${isInPath ? "bg-path/20" : "bg-surface"}
-        ${isHead ? "bg-path/40 ring-2 ring-path ring-inset" : ""}
-      `}
-    >
-      {/* Path connectors */}
-      {hasConnector && isInPath && (
-        <>
-          {connectTop && (
-            <div className="absolute top-0 left-1/2 -translate-x-1/2 w-2/5 h-1/2 bg-path/30 rounded-sm" />
-          )}
-          {connectBottom && (
-            <div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-2/5 h-1/2 bg-path/30 rounded-sm" />
-          )}
-          {connectLeft && (
-            <div className="absolute left-0 top-1/2 -translate-y-1/2 w-1/2 h-2/5 bg-path/30 rounded-sm" />
-          )}
-          {connectRight && (
-            <div className="absolute right-0 top-1/2 -translate-y-1/2 w-1/2 h-2/5 bg-path/30 rounded-sm" />
-          )}
-        </>
+    <div className="relative flex items-center justify-center aspect-square">
+      {/* Path fill — solid block that merges with adjacent path cells */}
+      {isInPath && (
+        <div
+          className={`absolute transition-colors duration-100 ${
+            isHead ? "bg-path/50" : "bg-path/30"
+          }`}
+          style={{
+            top: connectTop ? "-1px" : "2px",
+            bottom: connectBottom ? "-1px" : "2px",
+            left: connectLeft ? "-1px" : "2px",
+            right: connectRight ? "-1px" : "2px",
+            borderRadius,
+          }}
+        />
       )}
 
-      {/* Dot */}
+      {/* Empty cell border (only when not in path) */}
+      {!isInPath && (
+        <div className="absolute inset-[1px] rounded border border-slate-700/40" />
+      )}
+
+      {/* Dot (numbered) */}
       {dotInfo && (
         <div
           className={`
             relative z-10 flex items-center justify-center
             w-3/5 h-3/5 rounded-full font-bold text-white text-sm
-            transition-colors duration-200 select-none
-            ${isConnectedDot ? "bg-dot-connected shadow-lg shadow-dot-connected/30" : "bg-dot shadow-lg shadow-dot/30"}
+            transition-all duration-200 select-none
+            ${isConnectedDot
+              ? "bg-dot-connected shadow-[0_0_10px_rgba(16,185,129,0.4)]"
+              : "bg-dot shadow-[0_0_10px_rgba(245,158,11,0.3)]"
+            }
           `}
         >
           {dotInfo.number}
         </div>
       )}
 
-      {/* Path dot (non-numbered cells in path) */}
-      {isInPath && !dotInfo && (
-        <div className="relative z-10 w-1/4 h-1/4 rounded-full bg-path/60" />
+      {/* Head indicator — pulsing (non-dot cell) */}
+      {isHead && !dotInfo && (
+        <div
+          className="relative z-10 w-1/3 h-1/3 rounded-full bg-path-light/80"
+          style={{ animation: "head-pulse 1.2s ease-in-out infinite" }}
+        />
+      )}
+
+      {/* Head indicator — ring around dot */}
+      {isHead && dotInfo && (
+        <div className="absolute inset-0 z-20 flex items-center justify-center pointer-events-none">
+          <div
+            className="w-4/5 h-4/5 rounded-full border-2 border-path-light"
+            style={{ animation: "head-pulse 1.2s ease-in-out infinite" }}
+          />
+        </div>
       )}
     </div>
   );

@@ -1,10 +1,10 @@
 import { useState } from "react";
-import { getCompletedLevels } from "@/utils/progress";
 
 type LevelSelectProps = {
   onSelectLevel: (levelNumber: number) => void;
   onSignOut?: () => void;
   userEmail?: string;
+  currentLevel: number;
 };
 
 const LEVELS_PER_PAGE = 50;
@@ -26,9 +26,8 @@ function getTierLabel(page: number): string {
   return "8x8 Expert";
 }
 
-export function LevelSelect({ onSelectLevel, onSignOut, userEmail }: LevelSelectProps) {
+export function LevelSelect({ onSelectLevel, onSignOut, userEmail, currentLevel }: LevelSelectProps) {
   const [page, setPage] = useState(0);
-  const completed = getCompletedLevels();
 
   const startLevel = page * LEVELS_PER_PAGE + 1;
   const endLevel = Math.min(startLevel + LEVELS_PER_PAGE - 1, TOTAL_LEVELS);
@@ -55,7 +54,7 @@ export function LevelSelect({ onSelectLevel, onSignOut, userEmail }: LevelSelect
       <p className="text-text-muted mb-6">Connect the dots. Fill every cell.</p>
 
       <div className="text-sm text-text-muted mb-4">
-        {completed.size} / {TOTAL_LEVELS} completed
+        {Math.max(0, currentLevel - 1)} / {TOTAL_LEVELS} completed
       </div>
 
       {/* Page navigation */}
@@ -82,20 +81,31 @@ export function LevelSelect({ onSelectLevel, onSignOut, userEmail }: LevelSelect
       {/* Level grid */}
       <div className="grid grid-cols-10 gap-2 max-w-md w-full">
         {levels.map((level) => {
-          const isCompleted = completed.has(level);
+          const isCompleted = level < currentLevel;
+          const isUnlocked = level <= currentLevel;
           return (
             <button
               key={level}
-              onClick={() => onSelectLevel(level)}
+              onClick={() => isUnlocked && onSelectLevel(level)}
+              disabled={!isUnlocked}
               className={`
                 relative aspect-square flex items-center justify-center rounded-lg
                 text-white text-xs font-semibold transition-all
-                ${isCompleted ? "bg-slate-600 opacity-70" : getTierColor(level)}
+                ${!isUnlocked
+                  ? "bg-slate-800 opacity-40 cursor-not-allowed"
+                  : isCompleted
+                    ? "bg-slate-600 opacity-70"
+                    : getTierColor(level)
+                }
               `}
             >
-              {level}
+              {isUnlocked ? level : (
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" className="w-3.5 h-3.5 opacity-50">
+                  <path fillRule="evenodd" d="M10 1a4.5 4.5 0 0 0-4.5 4.5V9H5a2 2 0 0 0-2 2v6a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-6a2 2 0 0 0-2-2h-.5V5.5A4.5 4.5 0 0 0 10 1Zm3 8V5.5a3 3 0 1 0-6 0V9h6Z" clipRule="evenodd" />
+                </svg>
+              )}
               {isCompleted && (
-                <span className="absolute -top-1 -right-1 text-[10px]">
+                <span className="absolute -top-1 -right-1 text-[10px] text-emerald-400">
                   &#10003;
                 </span>
               )}

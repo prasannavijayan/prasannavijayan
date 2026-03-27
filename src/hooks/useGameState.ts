@@ -38,7 +38,7 @@ function gameReducer(state: GameState, action: GameAction): GameState {
     }
 
     case "EXTEND_PATH": {
-      if (!state.isDragging || state.path.length === 0) return state;
+      if (state.path.length === 0) return state;
 
       const { position } = action;
       const tail = state.path[state.path.length - 1];
@@ -65,7 +65,8 @@ function gameReducer(state: GameState, action: GameAction): GameState {
         newPath,
         state.level.gridSize,
         state.level.dots.length,
-        nextDot
+        nextDot,
+        state.level.dots
       );
 
       return {
@@ -77,7 +78,7 @@ function gameReducer(state: GameState, action: GameAction): GameState {
     }
 
     case "RETRACT_PATH": {
-      if (!state.isDragging || state.path.length <= 1) return state;
+      if (state.path.length <= 1) return state;
 
       const { position } = action;
       const secondToLast = state.path[state.path.length - 2];
