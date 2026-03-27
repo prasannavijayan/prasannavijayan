@@ -23,8 +23,6 @@ export function Cell({
   connectLeft,
   connectRight,
 }: CellProps) {
-  const hasConnector = connectTop || connectBottom || connectLeft || connectRight;
-
   // Determine border radius: round only the exposed (non-connected) corners
   const tl = !connectTop && !connectLeft ? "6px" : "0";
   const tr = !connectTop && !connectRight ? "6px" : "0";
