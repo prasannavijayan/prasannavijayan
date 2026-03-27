@@ -83,7 +83,7 @@ export default function App() {
       <LevelSelect
         onSelectLevel={handleSelectLevel}
         onSignOut={signOut}
-        userEmail={user.email}
+        userEmail={user.email ?? undefined}
       />
     );
   }
