@@ -3,6 +3,8 @@ import { getCompletedLevels } from "@/utils/progress";
 
 type LevelSelectProps = {
   onSelectLevel: (levelNumber: number) => void;
+  onSignOut?: () => void;
+  userEmail?: string;
 };
 
 const LEVELS_PER_PAGE = 50;
@@ -24,7 +26,7 @@ function getTierLabel(page: number): string {
   return "8x8 Expert";
 }
 
-export function LevelSelect({ onSelectLevel }: LevelSelectProps) {
+export function LevelSelect({ onSelectLevel, onSignOut, userEmail }: LevelSelectProps) {
   const [page, setPage] = useState(0);
   const completed = getCompletedLevels();
 
@@ -38,7 +40,18 @@ export function LevelSelect({ onSelectLevel }: LevelSelectProps) {
 
   return (
     <div className="flex flex-col items-center min-h-screen bg-bg p-4">
-      <h1 className="text-3xl font-bold text-white mt-8 mb-2">Zip</h1>
+      <div className="w-full max-w-md flex items-center justify-between mt-8 mb-2">
+        <h1 className="text-3xl font-bold text-white">Zip</h1>
+        {onSignOut && (
+          <button
+            onClick={onSignOut}
+            title={userEmail}
+            className="text-xs text-[--color-text-muted] hover:text-white transition-colors px-2 py-1 rounded hover:bg-white/10"
+          >
+            Sign out
+          </button>
+        )}
+      </div>
       <p className="text-text-muted mb-6">Connect the dots. Fill every cell.</p>
 
       <div className="text-sm text-text-muted mb-4">

@@ -6,6 +6,11 @@ import babel from "@rolldown/plugin-babel";
 import { VitePWA } from "vite-plugin-pwa";
 
 export default defineConfig({
+  server: {
+    headers: {
+      "Cross-Origin-Opener-Policy": "same-origin-allow-popups",
+    },
+  },
   resolve: {
     alias: {
       "@": path.resolve(__dirname, "./src"),
