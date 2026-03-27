@@ -11,8 +11,10 @@
   --color-surface: #1e293b;
   --color-text: #f8fafc;
   --color-text-muted: #94a3b8;
-  --animate-fade-in: fade-in 0.2s ease-out;
-  --animate-scale-in: scale-in 0.3s ease-out;
+  --animate-fade-in: fade-in 0.3s ease-out;
+  --animate-fade-out: fade-out 0.4s ease-out forwards;
+  --animate-slide-to-center: slide-to-center 0.5s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+  --animate-slide-away: slide-away 0.5s cubic-bezier(0.22, 1, 0.36, 1) forwards;
 }
 
 @keyframes fade-in {
@@ -20,14 +22,121 @@
   to { opacity: 1; }
 }
 
-@keyframes scale-in {
-  from { opacity: 0; transform: scale(0.9); }
-  to { opacity: 1; transform: scale(1); }
+@keyframes fade-out {
+  from { opacity: 1; }
+  to { opacity: 0; }
+}
+
+/* Modal slides from top to center */
+@keyframes slide-to-center {
+  from { opacity: 0.3; transform: translateY(-80vh); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* On "Next Level" — dip down then slide back up */
+@keyframes slide-away {
+  0% { opacity: 1; transform: translateY(0); }
+  30% { opacity: 1; transform: translateY(40px); }
+  100% { opacity: 0; transform: translateY(-80vh); }
 }
 
 @keyframes head-pulse {
   0%, 100% { box-shadow: 0 0 0 0 rgba(59, 130, 246, 0.5); }
   50% { box-shadow: 0 0 0 6px rgba(59, 130, 246, 0); }
+}
+
+@keyframes board-shake {
+  0%, 100% { transform: translate(0, 0) rotate(0deg); }
+  10% { transform: translate(-4px, -2px) rotate(-1deg); }
+  20% { transform: translate(4px, 2px) rotate(1deg); }
+  30% { transform: translate(-3px, 3px) rotate(-0.5deg); }
+  40% { transform: translate(3px, -2px) rotate(0.5deg); }
+  50% { transform: translate(-2px, 2px) rotate(-0.5deg); }
+  60% { transform: translate(2px, -1px) rotate(0.3deg); }
+  70% { transform: translate(-1px, 1px) rotate(-0.2deg); }
+  80% { transform: translate(1px, -1px) rotate(0.1deg); }
+  90% { transform: translate(0, 0) rotate(0deg); }
+}
+
+@keyframes path-celebrate {
+  0% { filter: brightness(1); }
+  50% { filter: brightness(1.4); }
+  100% { filter: brightness(1); }
+}
+
+.board-celebrate {
+  animation: board-shake 1s ease-out, path-celebrate 1s ease-out;
+}
+
+/* Level transition: current slides out left */
+@keyframes slide-out-left {
+  from { transform: translateX(0); opacity: 1; }
+  to { transform: translateX(-100%); opacity: 0; }
+}
+
+/* Level transition: new slides in from right */
+@keyframes slide-in-right {
+  from { transform: translateX(100%); opacity: 0; }
+  to { transform: translateX(0); opacity: 1; }
+}
+
+.level-exit {
+  animation: slide-out-left 0.4s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+}
+
+.level-enter {
+  animation: slide-in-right 0.4s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+}
+
+/* Menu → Game: zoom expand from tile */
+@keyframes zoom-expand {
+  0% {
+    transform: scale(0.3);
+    opacity: 0;
+    border-radius: 12px;
+  }
+  50% {
+    opacity: 1;
+    border-radius: 4px;
+  }
+  100% {
+    transform: scale(1);
+    opacity: 1;
+    border-radius: 0;
+  }
+}
+
+/* Game → Menu: shrink back */
+@keyframes zoom-shrink {
+  0% {
+    transform: scale(1);
+    opacity: 1;
+  }
+  100% {
+    transform: scale(0.3);
+    opacity: 0;
+  }
+}
+
+.page-zoom-in {
+  animation: zoom-expand 0.5s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+}
+
+.page-zoom-out {
+  animation: zoom-shrink 0.35s cubic-bezier(0.4, 0, 1, 1) forwards;
+}
+
+.page-enter-menu {
+  animation: fade-in 0.3s ease-out;
+}
+
+@keyframes game-appear {
+  from { opacity: 0.4; }
+  to { opacity: 1; }
+}
+
+.game-appear {
+  animation: game-appear 0.5s ease-out;
 }
 
 body {

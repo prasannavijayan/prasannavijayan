@@ -7,31 +7,61 @@ import { AuthScreen } from "@/components/AuthScreen";
 import { useAuth } from "@/hooks/useAuth";
 import { useProgress, useUpdateProgress } from "@/hooks/useProgress";
 
+type Screen = "menu" | "game";
+type TransitionState = "idle" | "zoom-in" | "zoom-out";
+
 export default function App() {
   const { user, loading: authLoading, error: authError, signInWithGoogle, signOut } = useAuth();
   const { data: savedLevel, isLoading: progressLoading, error: progressError } = useProgress(user?.uid);
   const { mutate: updateProgress } = useUpdateProgress(user?.uid);
 
   const [currentLevel, setCurrentLevel] = useState<Level | null>(null);
-  const [showLevelSelect, setShowLevelSelect] = useState(false);
+  const [screen, setScreen] = useState<Screen>("menu");
+  const [transition, setTransition] = useState<TransitionState>("idle");
+  const [pendingLevel, setPendingLevel] = useState<Level | null>(null);
+  const [hasAutoLoaded, setHasAutoLoaded] = useState(false);
 
   // Once progress loads (or fails), jump into the saved level or default to 1
   const effectiveLevel = savedLevel ?? (progressError ? 1 : undefined);
 
+  // Auto-load into game on first load only
   useEffect(() => {
-    if (effectiveLevel !== undefined && currentLevel === null && !showLevelSelect) {
-      setCurrentLevel(generateLevel(effectiveLevel));
+    if (!hasAutoLoaded && effectiveLevel !== undefined && currentLevel === null && screen === "menu" && transition === "idle") {
+      setHasAutoLoaded(true);
+      const level = generateLevel(effectiveLevel);
+      setPendingLevel(level);
+      setTransition("zoom-in");
+
+      setTimeout(() => {
+        setCurrentLevel(level);
+        setScreen("game");
+        setPendingLevel(null);
+        setTransition("idle");
+      }, 500);
     }
-  }, [effectiveLevel, currentLevel, showLevelSelect]);
+  }, [hasAutoLoaded, effectiveLevel, currentLevel, screen, transition]);
 
   function handleSelectLevel(levelNumber: number) {
-    setCurrentLevel(generateLevel(levelNumber));
-    setShowLevelSelect(false);
+    const level = generateLevel(levelNumber);
+    setPendingLevel(level);
+    setTransition("zoom-in");
+
+    setTimeout(() => {
+      setCurrentLevel(level);
+      setScreen("game");
+      setPendingLevel(null);
+      setTransition("idle");
+    }, 500);
   }
 
   function handleBack() {
-    setCurrentLevel(null);
-    setShowLevelSelect(true);
+    setTransition("zoom-out");
+
+    setTimeout(() => {
+      setCurrentLevel(null);
+      setScreen("menu");
+      setTransition("idle");
+    }, 350);
   }
 
   // Only advance to next level if user is progressing past their saved level
@@ -47,9 +77,6 @@ export default function App() {
 
     setCurrentLevel(generateLevel(nextLevelNumber));
   }
-
-  // DEBUG: log state to console on every render
-  console.log("[App] authLoading:", authLoading, "user:", user?.uid, "progressLoading:", progressLoading, "progressError:", progressError?.toString(), "savedLevel:", savedLevel, "effectiveLevel:", effectiveLevel, "currentLevel:", currentLevel?.levelNumber, "showLevelSelect:", showLevelSelect);
 
   if (authLoading) {
     return (
@@ -78,22 +105,63 @@ export default function App() {
     console.error("Progress fetch failed:", progressError);
   }
 
-  if (showLevelSelect || !currentLevel) {
+  // Zoom-in transition overlay (menu → game)
+  if (transition === "zoom-in") {
     return (
-      <LevelSelect
-        onSelectLevel={handleSelectLevel}
-        onSignOut={signOut}
-        userEmail={user.email ?? undefined}
-        currentLevel={effectiveLevel ?? 1}
-      />
+      <div className="min-h-screen bg-bg page-zoom-in">
+        <div className="flex flex-col items-center justify-center min-h-screen p-4">
+          <div className="text-center">
+            <h2 className="text-3xl font-bold text-white mb-2">
+              Level {pendingLevel?.levelNumber}
+            </h2>
+            <p className="text-text-muted text-sm">
+              {pendingLevel?.gridSize}x{pendingLevel?.gridSize}
+            </p>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  // Zoom-out transition (game → menu)
+  if (transition === "zoom-out" && currentLevel) {
+    return (
+      <div className="min-h-screen bg-bg page-zoom-out">
+        <Game
+          level={currentLevel}
+          uid={user.uid}
+          displayName={user.displayName ?? user.email ?? "Anonymous"}
+          userEmail={user.email ?? undefined}
+          onBack={() => {}}
+          onNextLevel={() => {}}
+          onSignOut={() => {}}
+        />
+      </div>
+    );
+  }
+
+  if (screen === "menu" || !currentLevel) {
+    return (
+      <div className="page-enter-menu">
+        <LevelSelect
+          onSelectLevel={handleSelectLevel}
+          onSignOut={signOut}
+          userEmail={user.email ?? undefined}
+          currentLevel={effectiveLevel ?? 1}
+        />
+      </div>
     );
   }
 
   return (
     <Game
       level={currentLevel}
+      uid={user.uid}
+      displayName={user.displayName ?? user.email ?? "Anonymous"}
+      userEmail={user.email ?? undefined}
       onBack={handleBack}
       onNextLevel={handleNextLevel}
+      onSignOut={signOut}
     />
   );
 }

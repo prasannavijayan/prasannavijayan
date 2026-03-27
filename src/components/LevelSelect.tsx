@@ -1,5 +1,3 @@
-import { useState } from "react";
-
 type LevelSelectProps = {
   onSelectLevel: (levelNumber: number) => void;
   onSignOut?: () => void;
@@ -7,9 +5,8 @@ type LevelSelectProps = {
   currentLevel: number;
 };
 
-const LEVELS_PER_PAGE = 50;
 const TOTAL_LEVELS = 500;
-const TOTAL_PAGES = Math.ceil(TOTAL_LEVELS / LEVELS_PER_PAGE);
+const VISIBLE_AHEAD = 10;
 
 function getTierColor(level: number): string {
   if (level <= 100) return "bg-emerald-600 hover:bg-emerald-500";
@@ -18,100 +15,96 @@ function getTierColor(level: number): string {
   return "bg-red-600 hover:bg-red-500";
 }
 
-function getTierLabel(page: number): string {
-  const start = page * LEVELS_PER_PAGE + 1;
-  if (start <= 100) return "5x5 Easy";
-  if (start <= 250) return "6x6 Medium";
-  if (start <= 400) return "7x7 Hard";
-  return "8x8 Expert";
-}
-
 export function LevelSelect({ onSelectLevel, onSignOut, userEmail, currentLevel }: LevelSelectProps) {
-  const [page, setPage] = useState(0);
-
-  const startLevel = page * LEVELS_PER_PAGE + 1;
-  const endLevel = Math.min(startLevel + LEVELS_PER_PAGE - 1, TOTAL_LEVELS);
-
-  const levels = [];
-  for (let i = startLevel; i <= endLevel; i++) {
-    levels.push(i);
-  }
+  // Always show exactly 10 tiles: completed levels + locked levels to fill 2x5
+  const maxVisible = Math.min(
+    Math.ceil((currentLevel + VISIBLE_AHEAD - 1) / VISIBLE_AHEAD) * VISIBLE_AHEAD,
+    TOTAL_LEVELS
+  );
+  const visibleLevels = Array.from({ length: maxVisible }, (_, i) => i + 1);
+  const hiddenCount = TOTAL_LEVELS - maxVisible;
 
   return (
-    <div className="flex flex-col items-center min-h-screen bg-bg p-4">
-      <div className="w-full max-w-md flex items-center justify-between mt-8 mb-2">
-        <h1 className="text-3xl font-bold text-white">Zip</h1>
-        {onSignOut && (
-          <button
-            onClick={onSignOut}
-            title={userEmail}
-            className="text-xs text-[--color-text-muted] hover:text-white transition-colors px-2 py-1 rounded hover:bg-white/10"
-          >
-            Sign out
-          </button>
-        )}
-      </div>
-      <p className="text-text-muted mb-6">Connect the dots. Fill every cell.</p>
+    <div className="flex flex-col items-center justify-center min-h-screen bg-bg p-4">
+      <div className="w-full max-w-md">
+        <div className="flex items-center justify-between mb-4">
+          <div>
+            <h1 className="text-xl font-bold text-white">Zip</h1>
+            <p className="text-text-muted text-xs">Connect the dots. Fill every cell.</p>
+          </div>
+          <div className="flex items-center gap-3">
+            <span className="text-text-muted text-xs">
+              {Math.max(0, currentLevel - 1)}/{TOTAL_LEVELS}
+            </span>
+            {onSignOut && (
+              <button
+                onClick={onSignOut}
+                title={userEmail}
+                className="text-xs text-text-muted hover:text-white transition-colors px-2 py-1 rounded hover:bg-white/10"
+              >
+                Sign out
+              </button>
+            )}
+          </div>
+        </div>
 
-      <div className="text-sm text-text-muted mb-4">
-        {Math.max(0, currentLevel - 1)} / {TOTAL_LEVELS} completed
-      </div>
+        {/* Scrollable 2-column level grid */}
+        <div className="max-h-[60vh] overflow-y-auto pb-4">
+        <div className="grid grid-cols-2 gap-2">
+          {visibleLevels.map((level) => {
+            const isCompleted = level < currentLevel;
+            const isUnlocked = level <= currentLevel;
 
-      {/* Page navigation */}
-      <div className="flex items-center gap-3 mb-4">
-        <button
-          onClick={() => setPage((p) => Math.max(0, p - 1))}
-          disabled={page === 0}
-          className="px-3 py-1.5 rounded bg-slate-700 text-white text-sm disabled:opacity-30 hover:bg-slate-600 transition-colors"
-        >
-          &larr;
-        </button>
-        <span className="text-white text-sm font-medium">
-          {getTierLabel(page)} &middot; {startLevel}-{endLevel}
-        </span>
-        <button
-          onClick={() => setPage((p) => Math.min(TOTAL_PAGES - 1, p + 1))}
-          disabled={page === TOTAL_PAGES - 1}
-          className="px-3 py-1.5 rounded bg-slate-700 text-white text-sm disabled:opacity-30 hover:bg-slate-600 transition-colors"
-        >
-          &rarr;
-        </button>
-      </div>
-
-      {/* Level grid */}
-      <div className="grid grid-cols-10 gap-2 max-w-md w-full">
-        {levels.map((level) => {
-          const isCompleted = level < currentLevel;
-          const isUnlocked = level <= currentLevel;
-          return (
-            <button
-              key={level}
-              onClick={() => isUnlocked && onSelectLevel(level)}
-              disabled={!isUnlocked}
-              className={`
-                relative aspect-square flex items-center justify-center rounded-lg
-                text-white text-xs font-semibold transition-all
-                ${!isUnlocked
-                  ? "bg-slate-800 opacity-40 cursor-not-allowed"
-                  : isCompleted
-                    ? "bg-slate-600 opacity-70"
-                    : getTierColor(level)
-                }
-              `}
-            >
-              {isUnlocked ? level : (
-                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" className="w-3.5 h-3.5 opacity-50">
-                  <path fillRule="evenodd" d="M10 1a4.5 4.5 0 0 0-4.5 4.5V9H5a2 2 0 0 0-2 2v6a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-6a2 2 0 0 0-2-2h-.5V5.5A4.5 4.5 0 0 0 10 1Zm3 8V5.5a3 3 0 1 0-6 0V9h6Z" clipRule="evenodd" />
-                </svg>
-              )}
-              {isCompleted && (
-                <span className="absolute -top-1 -right-1 text-[10px] text-emerald-400">
-                  &#10003;
+            return (
+              <button
+                key={level}
+                onClick={() => isUnlocked && onSelectLevel(level)}
+                disabled={!isUnlocked}
+                className={`
+                  relative flex items-center justify-between px-4 py-3 rounded-xl
+                  text-white text-sm font-semibold transition-all
+                  ${!isUnlocked
+                    ? "bg-slate-800/60 opacity-40 cursor-not-allowed"
+                    : isCompleted
+                      ? "bg-slate-700/80 hover:bg-slate-600"
+                      : getTierColor(level)
+                  }
+                `}
+              >
+                <span className="flex items-center gap-2">
+                  {!isUnlocked && (
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" className="w-3.5 h-3.5 opacity-50 shrink-0">
+                      <path fillRule="evenodd" d="M10 1a4.5 4.5 0 0 0-4.5 4.5V9H5a2 2 0 0 0-2 2v6a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-6a2 2 0 0 0-2-2h-.5V5.5A4.5 4.5 0 0 0 10 1Zm3 8V5.5a3 3 0 1 0-6 0V9h6Z" clipRule="evenodd" />
+                    </svg>
+                  )}
+                  Level {level}
                 </span>
-              )}
-            </button>
-          );
-        })}
+                {isCompleted && (
+                  <span className="text-emerald-400 text-xs">✓</span>
+                )}
+                {isUnlocked && !isCompleted && (
+                  <span className="text-white/60 text-xs">→</span>
+                )}
+              </button>
+            );
+          })}
+        </div>
+
+        {/* Hidden levels message */}
+        {hiddenCount > 0 && (
+          <div className="mt-6 text-center py-6 border border-dashed border-slate-700 rounded-xl">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" className="w-6 h-6 mx-auto mb-2 text-slate-600">
+              <path fillRule="evenodd" d="M10 1a4.5 4.5 0 0 0-4.5 4.5V9H5a2 2 0 0 0-2 2v6a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-6a2 2 0 0 0-2-2h-.5V5.5A4.5 4.5 0 0 0 10 1Zm3 8V5.5a3 3 0 1 0-6 0V9h6Z" clipRule="evenodd" />
+            </svg>
+            <p className="text-text-muted text-sm font-medium">
+              {hiddenCount} more levels to unlock
+            </p>
+            <p className="text-slate-600 text-xs mt-1">
+              Keep playing to reveal new levels
+            </p>
+          </div>
+        )}
+        </div>
       </div>
     </div>
   );

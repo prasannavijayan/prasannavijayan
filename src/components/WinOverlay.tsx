@@ -1,31 +1,54 @@
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
+import { formatTime } from "@/hooks/useTimer";
 
 type WinOverlayProps = {
   levelNumber: number;
+  time: number;
   onNextLevel: () => void;
   onBackToMenu: () => void;
 };
 
 export function WinOverlay({
   levelNumber,
+  time,
   onNextLevel,
   onBackToMenu,
 }: WinOverlayProps) {
   const nextBtnRef = useRef<HTMLButtonElement>(null);
+  const [isExiting, setIsExiting] = useState(false);
 
   useEffect(() => {
-    // Small delay to let the scale-in animation start before focusing
-    const timer = setTimeout(() => nextBtnRef.current?.focus(), 300);
+    const timer = setTimeout(() => nextBtnRef.current?.focus(), 500);
     return () => clearTimeout(timer);
   }, []);
 
+  function handleNextLevel() {
+    if (isExiting) return;
+    setIsExiting(true);
+
+    setTimeout(() => {
+      onNextLevel();
+    }, 500);
+  }
+
   return (
-    <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-50 animate-fade-in">
-      <div className="bg-surface border border-slate-600 rounded-2xl p-8 text-center max-w-sm mx-4 animate-scale-in">
+    <div
+      className={`fixed inset-0 bg-black/60 flex items-center justify-center z-50 ${
+        isExiting ? "animate-fade-out" : "animate-fade-in"
+      }`}
+    >
+      <div
+        className={`bg-surface border border-slate-600 rounded-2xl p-8 text-center max-w-sm mx-4 ${
+          isExiting ? "animate-slide-away" : "animate-slide-to-center"
+        }`}
+      >
         <div className="text-5xl mb-4">&#127881;</div>
         <h2 className="text-2xl font-bold text-white mb-2">Level Complete!</h2>
-        <p className="text-text-muted mb-6">
+        <p className="text-text-muted mb-1">
           Level {levelNumber} solved
+        </p>
+        <p className="text-white font-mono tabular-nums text-lg mb-6">
+          ⏱ {formatTime(time)}
         </p>
         <div className="flex gap-3 justify-center">
           <button
@@ -37,8 +60,9 @@ export function WinOverlay({
           {levelNumber < 500 && (
             <button
               ref={nextBtnRef}
-              onClick={onNextLevel}
-              className="px-5 py-2.5 rounded-lg bg-path text-white font-semibold hover:bg-blue-600 transition-colors focus:outline-none focus:ring-2 focus:ring-path focus:ring-offset-2 focus:ring-offset-surface"
+              onClick={handleNextLevel}
+              disabled={isExiting}
+              className="px-5 py-2.5 rounded-lg bg-path text-white font-semibold hover:bg-blue-600 transition-colors focus:outline-none focus:ring-2 focus:ring-path focus:ring-offset-2 focus:ring-offset-surface disabled:opacity-50"
             >
               Next Level
             </button>
