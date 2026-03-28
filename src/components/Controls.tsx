@@ -1,8 +1,5 @@
 type ControlsProps = {
   levelNumber: number;
-  gridSize: number;
-  pathLength: number;
-  totalCells: number;
   onReset: () => void;
   onBack: () => void;
   onLeaderboard: () => void;
@@ -10,9 +7,6 @@ type ControlsProps = {
 
 export function Controls({
   levelNumber,
-  gridSize,
-  pathLength,
-  totalCells,
   onReset,
   onBack,
   onLeaderboard,
@@ -28,8 +22,8 @@ export function Controls({
         </button>
         <div className="text-center">
           <div className="text-white font-semibold">Level {levelNumber}</div>
-          <div className="text-text-muted text-xs">
-            {gridSize}x{gridSize} &middot; {pathLength}/{totalCells}
+          <div className="hidden md:block text-text-muted text-xs">
+            Arrow keys to move
           </div>
         </div>
         <button

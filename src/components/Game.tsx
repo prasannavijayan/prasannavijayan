@@ -129,9 +129,6 @@ export function Game({ level, uid, displayName, userEmail, onBack, onNextLevel, 
         </div>
         <Controls
           levelNumber={state.level.levelNumber}
-          gridSize={state.level.gridSize}
-          pathLength={state.path.length}
-          totalCells={state.level.gridSize * state.level.gridSize}
           onReset={() => dispatch({ type: "RESET" })}
           onBack={onBack}
           onLeaderboard={() => setShowLeaderboard(true)}
