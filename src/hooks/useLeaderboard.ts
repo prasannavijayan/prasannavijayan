@@ -20,7 +20,16 @@ export type LeaderboardEntry = {
   updated_at: string;
 };
 
+export type OverallEntry = {
+  uid: string;
+  displayName: string;
+  totalTime: number;    // sum of best times across all completed levels
+  levelsCompleted: number;
+  updated_at: string;
+};
+
 const LEADERBOARD_KEY = (level: number) => ["leaderboard", level];
+const OVERALL_KEY = ["leaderboard", "overall"];
 
 async function fetchLeaderboard(level: number): Promise<LeaderboardEntry[]> {
   const q = query(
@@ -33,6 +42,22 @@ async function fetchLeaderboard(level: number): Promise<LeaderboardEntry[]> {
   return snap.docs.map((d) => d.data() as LeaderboardEntry);
 }
 
+async function fetchOverallLeaderboard(): Promise<OverallEntry[]> {
+  const q = query(
+    collection(db, "overall_leaderboard"),
+    orderBy("levelsCompleted", "desc"),
+    limit(50)
+  );
+  const snap = await getDocs(q);
+  const entries = snap.docs.map((d) => d.data() as OverallEntry);
+  // Secondary sort: same level count → lower total time wins
+  return entries.sort((a, b) =>
+    b.levelsCompleted !== a.levelsCompleted
+      ? b.levelsCompleted - a.levelsCompleted
+      : a.totalTime - b.totalTime
+  );
+}
+
 async function submitScore(
   uid: string,
   displayName: string,
@@ -43,12 +68,17 @@ async function submitScore(
   const ref = doc(db, "leaderboard", docId);
   const existing = await getDoc(ref);
 
-  if (existing.exists()) {
+  const isNewEntry = !existing.exists();
+
+  if (!isNewEntry) {
     const prev = existing.data() as LeaderboardEntry;
     // Only update if new time is faster
     if (time >= prev.time) return;
   }
 
+  const oldTime = isNewEntry ? 0 : (existing.data() as LeaderboardEntry).time;
+
+  // Update per-level score
   await setDoc(ref, {
     uid,
     displayName,
@@ -56,6 +86,29 @@ async function submitScore(
     time,
     updated_at: new Date().toISOString(),
   });
+
+  // Update overall score using delta so improvements reduce the total
+  const overallRef = doc(db, "overall_leaderboard", uid);
+  const overallDoc = await getDoc(overallRef);
+
+  if (overallDoc.exists()) {
+    const overall = overallDoc.data() as OverallEntry;
+    await setDoc(overallRef, {
+      uid,
+      displayName,
+      totalTime: overall.totalTime + (time - oldTime),
+      levelsCompleted: isNewEntry ? overall.levelsCompleted + 1 : overall.levelsCompleted,
+      updated_at: new Date().toISOString(),
+    });
+  } else {
+    await setDoc(overallRef, {
+      uid,
+      displayName,
+      totalTime: time,
+      levelsCompleted: 1,
+      updated_at: new Date().toISOString(),
+    });
+  }
 }
 
 export function useLeaderboard(level: number, enabled: boolean) {
@@ -63,7 +116,16 @@ export function useLeaderboard(level: number, enabled: boolean) {
     queryKey: LEADERBOARD_KEY(level),
     queryFn: () => fetchLeaderboard(level),
     enabled,
-    staleTime: 30_000, // 30s cache
+    staleTime: 30_000,
+  });
+}
+
+export function useOverallLeaderboard(enabled: boolean) {
+  return useQuery({
+    queryKey: OVERALL_KEY,
+    queryFn: fetchOverallLeaderboard,
+    enabled,
+    staleTime: 30_000,
   });
 }
 
@@ -83,10 +145,8 @@ export function useSubmitScore() {
       time: number;
     }) => submitScore(uid, displayName, level, time),
     onSuccess: (_data, vars) => {
-      // Invalidate leaderboard cache for this level
-      queryClient.invalidateQueries({
-        queryKey: LEADERBOARD_KEY(vars.level),
-      });
+      queryClient.invalidateQueries({ queryKey: LEADERBOARD_KEY(vars.level) });
+      queryClient.invalidateQueries({ queryKey: OVERALL_KEY });
     },
   });
 }
