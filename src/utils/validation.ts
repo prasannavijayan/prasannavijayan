@@ -24,12 +24,15 @@ export function buildPathSet(path: Position[]): Set<string> {
 
 export function checkWin(
   path: Position[],
-  gridSize: number,
+  rows: number,
+  cols: number,
+  wallCount: number,
   totalDots: number,
   nextRequiredDot: number,
   dots: Dot[]
 ): boolean {
-  if (path.length !== gridSize * gridSize) return false;
+  // Path must cover every non-wall cell exactly once
+  if (path.length !== rows * cols - wallCount) return false;
   if (nextRequiredDot <= totalDots) return false;
 
   // Path must end on the last numbered dot

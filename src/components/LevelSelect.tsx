@@ -5,14 +5,20 @@ type LevelSelectProps = {
   currentLevel: number;
 };
 
-const TOTAL_LEVELS = 500;
+const TOTAL_LEVELS = 900;
 const VISIBLE_AHEAD = 10;
 
 function getTierColor(level: number): string {
-  if (level <= 100) return "bg-emerald-600 hover:bg-emerald-500";
-  if (level <= 250) return "bg-blue-600 hover:bg-blue-500";
-  if (level <= 400) return "bg-orange-600 hover:bg-orange-500";
-  return "bg-red-600 hover:bg-red-500";
+  // Original tiers (no walls)
+  if (level <= 100) return "bg-emerald-600 hover:bg-emerald-500"; // 5×5
+  if (level <= 250) return "bg-blue-600 hover:bg-blue-500";       // 6×6
+  if (level <= 400) return "bg-orange-600 hover:bg-orange-500";   // 7×7
+  if (level <= 500) return "bg-red-600 hover:bg-red-500";         // 8×8
+  // Wall tiers
+  if (level <= 600) return "bg-purple-600 hover:bg-purple-500";   // 6×6 + walls
+  if (level <= 700) return "bg-violet-600 hover:bg-violet-500";   // 7×7 + walls
+  if (level <= 800) return "bg-rose-600 hover:bg-rose-500";       // 8×8 + walls
+  return "bg-fuchsia-600 hover:bg-fuchsia-500";                   // 9×8 + walls
 }
 
 export function LevelSelect({ onSelectLevel, onSignOut, userEmail, currentLevel }: LevelSelectProps) {

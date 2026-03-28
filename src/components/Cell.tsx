@@ -1,6 +1,7 @@
 import type { Dot } from "@/types";
 
 type CellProps = {
+  isWall: boolean;
   dotInfo: Dot | undefined;
   isInPath: boolean;
   isHead: boolean;
@@ -14,6 +15,7 @@ type CellProps = {
 };
 
 export function Cell({
+  isWall,
   dotInfo,
   isInPath,
   isHead,
@@ -23,6 +25,23 @@ export function Cell({
   connectLeft,
   connectRight,
 }: CellProps) {
+  // Wall cell — solid dark block, no interaction
+  if (isWall) {
+    return (
+      <div className="relative flex items-center justify-center aspect-square">
+        <div className="absolute inset-0 bg-slate-700 rounded-sm" />
+        {/* subtle cross-hatch texture */}
+        <div
+          className="absolute inset-0 rounded-sm opacity-30"
+          style={{
+            backgroundImage:
+              "repeating-linear-gradient(45deg, transparent, transparent 3px, rgba(0,0,0,0.4) 3px, rgba(0,0,0,0.4) 4px)",
+          }}
+        />
+      </div>
+    );
+  }
+
   // Determine border radius: round only the exposed (non-connected) corners
   const tl = !connectTop && !connectLeft ? "6px" : "0";
   const tr = !connectTop && !connectRight ? "6px" : "0";
@@ -32,7 +51,7 @@ export function Cell({
 
   return (
     <div className="relative flex items-center justify-center aspect-square">
-      {/* Path fill — solid block that merges with adjacent path cells */}
+      {/* Path fill */}
       {isInPath && (
         <div
           className={`absolute transition-colors duration-100 ${
@@ -48,7 +67,7 @@ export function Cell({
         />
       )}
 
-      {/* Empty cell border (only when not in path) */}
+      {/* Empty cell border */}
       {!isInPath && (
         <div className="absolute inset-[1px] rounded border border-slate-700/40" />
       )}
@@ -60,9 +79,10 @@ export function Cell({
             relative z-10 flex items-center justify-center
             w-3/5 h-3/5 rounded-full font-bold text-white text-sm
             transition-all duration-200 select-none
-            ${isConnectedDot
-              ? "bg-dot-connected shadow-[0_0_10px_rgba(16,185,129,0.4)]"
-              : "bg-dot shadow-[0_0_10px_rgba(245,158,11,0.3)]"
+            ${
+              isConnectedDot
+                ? "bg-dot-connected shadow-[0_0_10px_rgba(16,185,129,0.4)]"
+                : "bg-dot shadow-[0_0_10px_rgba(245,158,11,0.3)]"
             }
           `}
         >
@@ -70,7 +90,7 @@ export function Cell({
         </div>
       )}
 
-      {/* Head indicator — pulsing (non-dot cell) */}
+      {/* Head indicator — pulsing dot (non-dot cell) */}
       {isHead && !dotInfo && (
         <div
           className="relative z-10 w-1/3 h-1/3 rounded-full bg-path-light/80"

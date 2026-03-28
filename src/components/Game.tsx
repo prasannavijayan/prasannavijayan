@@ -38,7 +38,7 @@ export function Game({ level, uid, displayName, userEmail, onBack, onNextLevel, 
   // When level prop changes, select the new level and play enter animation
   useEffect(() => {
     if (state.level.levelNumber !== level.levelNumber) {
-      dispatch({ type: "SELECT_LEVEL", levelNumber: level.levelNumber });
+      dispatch({ type: "SELECT_LEVEL", level });
       setShowOverlay(false);
       setIsCelebrating(false);
       scoreSubmitted.current = false;

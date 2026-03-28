@@ -28,7 +28,7 @@ export default function App() {
   useEffect(() => {
     if (!hasAutoLoaded && effectiveLevel !== undefined && currentLevel === null && screen === "menu" && transition === "idle") {
       setHasAutoLoaded(true);
-      const level = generateLevel(effectiveLevel);
+      const level = generateLevel(effectiveLevel, user?.uid);
       setPendingLevel(level);
       setTransition("zoom-in");
 
@@ -42,7 +42,7 @@ export default function App() {
   }, [hasAutoLoaded, effectiveLevel, currentLevel, screen, transition]);
 
   function handleSelectLevel(levelNumber: number) {
-    const level = generateLevel(levelNumber);
+    const level = generateLevel(levelNumber, user?.uid);
     setPendingLevel(level);
     setTransition("zoom-in");
 
@@ -68,14 +68,14 @@ export default function App() {
   function handleNextLevel() {
     if (!currentLevel) return;
     const nextLevelNumber = currentLevel.levelNumber + 1;
-    if (nextLevelNumber > 500) return;
+    if (nextLevelNumber > 900) return;
 
     // Update DB only when advancing beyond saved progress
     if (savedLevel !== undefined && currentLevel.levelNumber >= savedLevel) {
       updateProgress(nextLevelNumber);
     }
 
-    setCurrentLevel(generateLevel(nextLevelNumber));
+    setCurrentLevel(generateLevel(nextLevelNumber, user?.uid));
   }
 
   if (authLoading) {
@@ -115,7 +115,7 @@ export default function App() {
               Level {pendingLevel?.levelNumber}
             </h2>
             <p className="text-text-muted text-sm">
-              {pendingLevel?.gridSize}x{pendingLevel?.gridSize}
+              {pendingLevel?.gridSize}x{pendingLevel?.gridCols ?? pendingLevel?.gridSize}
             </p>
           </div>
         </div>

@@ -11,9 +11,11 @@ export type Dot = {
 
 export type Level = {
   levelNumber: number;
-  gridSize: number;
+  gridSize: number;    // rows
+  gridCols?: number;   // cols — omitted when equal to gridSize (square grid)
   dots: Dot[];
   solution: Position[];
+  walls: Position[];   // blocked cells — empty array for levels 1–500
 };
 
 export type GameAction =
@@ -22,7 +24,7 @@ export type GameAction =
   | { type: "RETRACT_PATH"; position: Position }
   | { type: "END_DRAG" }
   | { type: "RESET" }
-  | { type: "SELECT_LEVEL"; levelNumber: number };
+  | { type: "SELECT_LEVEL"; level: Level };
 
 export type GameState = {
   level: Level;
