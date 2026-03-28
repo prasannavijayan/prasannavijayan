@@ -1,9 +1,16 @@
 import { useEffect, useRef, useState } from "react";
 
-export function useTimer(isPaused: boolean) {
+export function useTimer(isPaused: boolean, resetKey?: number | string) {
   const [elapsed, setElapsed] = useState(0);
   const startTime = useRef(Date.now());
   const pausedAt = useRef<number | null>(null);
+
+  // Reset timer whenever resetKey changes (e.g. new level loaded)
+  useEffect(() => {
+    setElapsed(0);
+    startTime.current = Date.now();
+    pausedAt.current = null;
+  }, [resetKey]);
 
   useEffect(() => {
     if (isPaused) {
@@ -22,7 +29,7 @@ export function useTimer(isPaused: boolean) {
     }, 200);
 
     return () => clearInterval(interval);
-  }, [isPaused]);
+  }, [isPaused, resetKey]);
 
   return elapsed;
 }

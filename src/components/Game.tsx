@@ -30,8 +30,8 @@ export function Game({ level, uid, displayName, userEmail, onBack, onNextLevel, 
   const pendingNextLevel = useRef(false);
   const scoreSubmitted = useRef(false);
 
-  // Timer pauses when level is complete
-  const elapsed = useTimer(state.isComplete);
+  // Timer pauses when level is complete; resets when level changes
+  const elapsed = useTimer(state.isComplete, state.level.levelNumber);
 
   const { mutate: submitScore } = useSubmitScore();
 
@@ -141,6 +141,7 @@ export function Game({ level, uid, displayName, userEmail, onBack, onNextLevel, 
           time={elapsed}
           onNextLevel={handleNextLevel}
           onBackToMenu={onBack}
+          onClose={() => setShowOverlay(false)}
         />
       )}
 

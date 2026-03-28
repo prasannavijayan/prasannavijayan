@@ -6,6 +6,7 @@ type WinOverlayProps = {
   time: number;
   onNextLevel: () => void;
   onBackToMenu: () => void;
+  onClose: () => void;
 };
 
 export function WinOverlay({
@@ -13,6 +14,7 @@ export function WinOverlay({
   time,
   onNextLevel,
   onBackToMenu,
+  onClose,
 }: WinOverlayProps) {
   const nextBtnRef = useRef<HTMLButtonElement>(null);
   const [isExiting, setIsExiting] = useState(false);
@@ -38,10 +40,17 @@ export function WinOverlay({
       }`}
     >
       <div
-        className={`bg-surface border border-slate-600 rounded-2xl p-8 text-center max-w-sm mx-4 ${
+        className={`relative bg-surface border border-slate-600 rounded-2xl p-8 text-center max-w-sm mx-4 ${
           isExiting ? "animate-slide-away" : "animate-slide-to-center"
         }`}
       >
+        <button
+          onClick={onClose}
+          className="absolute top-3 right-3 text-text-muted hover:text-white transition-colors w-7 h-7 flex items-center justify-center rounded-md hover:bg-white/10"
+          aria-label="Close"
+        >
+          ✕
+        </button>
         <div className="text-5xl mb-4">&#127881;</div>
         <h2 className="text-2xl font-bold text-white mb-2">Level Complete!</h2>
         <p className="text-text-muted mb-1">
