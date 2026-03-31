@@ -22,6 +22,7 @@ export type GameAction =
   | { type: "START_DRAG"; position: Position }
   | { type: "EXTEND_PATH"; position: Position }
   | { type: "RETRACT_PATH"; position: Position }
+  | { type: "RETRACT_TO"; position: Position }
   | { type: "END_DRAG" }
   | { type: "RESET" }
   | { type: "SELECT_LEVEL"; level: Level };

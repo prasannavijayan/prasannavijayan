@@ -55,23 +55,22 @@ export function Game({ level, uid, displayName, userEmail, onBack, onNextLevel, 
     if (state.isComplete) {
       markLevelCompleted(state.level.levelNumber);
 
-      // Submit score to leaderboard (only once per win)
-      if (!scoreSubmitted.current) {
-        scoreSubmitted.current = true;
-        submitScore({
-          uid,
-          displayName,
-          level: state.level.levelNumber,
-          time: elapsed,
-        });
-      }
-
       // Start board shake celebration
       setIsCelebrating(true);
 
       // Show the overlay after the shake animation finishes (1s)
+      // Submit score to leaderboard when modal appears (only once per win)
       const timer = setTimeout(() => {
         setShowOverlay(true);
+        if (!scoreSubmitted.current) {
+          scoreSubmitted.current = true;
+          submitScore({
+            uid,
+            displayName,
+            level: state.level.levelNumber,
+            time: elapsed,
+          });
+        }
       }, 1100);
 
       return () => clearTimeout(timer);

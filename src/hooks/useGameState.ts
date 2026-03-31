@@ -112,6 +112,30 @@ function gameReducer(state: GameState, action: GameAction): GameState {
       };
     }
 
+    case "RETRACT_TO": {
+      const { position } = action;
+      const targetIdx = state.path.findIndex(
+        (p) => p.row === position.row && p.col === position.col
+      );
+      if (targetIdx < 0 || targetIdx === state.path.length - 1) return state;
+
+      const newPath = state.path.slice(0, targetIdx + 1);
+
+      // Recalculate nextRequiredDot from the trimmed path
+      let nextDot = 1;
+      for (const p of newPath) {
+        const dot = getDotAt(p.row, p.col, state.level.dots);
+        if (dot) nextDot = dot.number + 1;
+      }
+
+      return {
+        ...state,
+        path: newPath,
+        nextRequiredDot: nextDot,
+        isComplete: false,
+      };
+    }
+
     case "END_DRAG": {
       return { ...state, isDragging: false };
     }

@@ -35,6 +35,7 @@ function pointerToCell(
 export function Board({ state, dispatch }: BoardProps) {
   const boardRef = useRef<HTMLDivElement>(null);
   const lastCellRef = useRef<string | null>(null);
+  const isDraggingRef = useRef(false);
   const { level, path, isDragging, isComplete, nextRequiredDot } = state;
   const { gridSize, dots, walls } = level;
   const rows = gridSize;
@@ -56,12 +57,14 @@ export function Board({ state, dispatch }: BoardProps) {
 
     const pos = pointerToCell(e, boardRef.current, rows, cols);
     lastCellRef.current = posKey(pos);
+    isDraggingRef.current = true;
     boardRef.current.setPointerCapture(e.pointerId);
     dispatch({ type: "START_DRAG", position: pos });
   }
 
   function handlePointerMove(e: PointerEvent<HTMLDivElement>) {
-    if (!isDragging || !boardRef.current) return;
+    // Use ref instead of state to avoid stale closure dropping early moves
+    if (!isDraggingRef.current || !boardRef.current) return;
 
     const pos = pointerToCell(e, boardRef.current, rows, cols);
     const key = posKey(pos);
@@ -69,13 +72,12 @@ export function Board({ state, dispatch }: BoardProps) {
     if (key === lastCellRef.current) return;
     lastCellRef.current = key;
 
-    // Check if this is a retraction (moving to second-to-last cell)
-    if (path.length >= 2) {
-      const secondToLast = path[path.length - 2];
-      if (secondToLast.row === pos.row && secondToLast.col === pos.col) {
-        dispatch({ type: "RETRACT_PATH", position: pos });
-        return;
-      }
+    // If finger moved back to any earlier cell in the path, retract to it
+    const posInPath = pathKeyToIndex.has(key);
+    const posIsHead = posInPath && pathKeyToIndex.get(key) === path.length - 1;
+    if (posInPath && !posIsHead) {
+      dispatch({ type: "RETRACT_TO", position: pos });
+      return;
     }
 
     dispatch({ type: "EXTEND_PATH", position: pos });
@@ -83,6 +85,13 @@ export function Board({ state, dispatch }: BoardProps) {
 
   function handlePointerUp() {
     lastCellRef.current = null;
+    isDraggingRef.current = false;
+    dispatch({ type: "END_DRAG" });
+  }
+
+  function handlePointerCancel() {
+    lastCellRef.current = null;
+    isDraggingRef.current = false;
     dispatch({ type: "END_DRAG" });
   }
 
@@ -190,6 +199,7 @@ export function Board({ state, dispatch }: BoardProps) {
       onPointerDown={handlePointerDown}
       onPointerMove={handlePointerMove}
       onPointerUp={handlePointerUp}
+      onPointerCancel={handlePointerCancel}
     >
       {cells}
     </div>

@@ -6,6 +6,7 @@ import { Game } from "@/components/Game";
 import { AuthScreen } from "@/components/AuthScreen";
 import { useAuth } from "@/hooks/useAuth";
 import { useProgress, useUpdateProgress } from "@/hooks/useProgress";
+import { getCompletedLevels } from "@/utils/progress";
 
 type Screen = "menu" | "game";
 type TransitionState = "idle" | "zoom-in" | "zoom-out";
@@ -55,6 +56,14 @@ export default function App() {
   }
 
   function handleBack() {
+    // If returning from a completed level at/beyond saved progress, advance the saved level
+    if (currentLevel && savedLevel !== undefined && currentLevel.levelNumber >= savedLevel) {
+      const completed = getCompletedLevels();
+      if (completed.has(currentLevel.levelNumber)) {
+        updateProgress(currentLevel.levelNumber + 1);
+      }
+    }
+
     setTransition("zoom-out");
 
     setTimeout(() => {

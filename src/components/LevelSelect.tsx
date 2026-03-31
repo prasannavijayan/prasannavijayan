@@ -1,3 +1,5 @@
+import { useEffect, useRef } from "react";
+
 type LevelSelectProps = {
   onSelectLevel: (levelNumber: number) => void;
   onSignOut?: () => void;
@@ -22,6 +24,12 @@ function getTierColor(level: number): string {
 }
 
 export function LevelSelect({ onSelectLevel, onSignOut, userEmail, currentLevel }: LevelSelectProps) {
+  const currentLevelRef = useRef<HTMLButtonElement>(null);
+
+  useEffect(() => {
+    currentLevelRef.current?.scrollIntoView({ block: "center", behavior: "instant" });
+  }, [currentLevel]);
+
   // Always show exactly 10 tiles: completed levels + locked levels to fill 2x5
   const maxVisible = Math.min(
     Math.ceil((currentLevel + VISIBLE_AHEAD - 1) / VISIBLE_AHEAD) * VISIBLE_AHEAD,
@@ -64,6 +72,7 @@ export function LevelSelect({ onSelectLevel, onSignOut, userEmail, currentLevel 
             return (
               <button
                 key={level}
+                ref={level === currentLevel ? currentLevelRef : undefined}
                 onClick={() => isUnlocked && onSelectLevel(level)}
                 disabled={!isUnlocked}
                 className={`
