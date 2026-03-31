@@ -36,7 +36,7 @@ export function Board({ state, dispatch }: BoardProps) {
   const boardRef = useRef<HTMLDivElement>(null);
   const lastCellRef = useRef<string | null>(null);
   const isDraggingRef = useRef(false);
-  const { level, path, isDragging, isComplete, nextRequiredDot } = state;
+  const { level, path, isComplete, nextRequiredDot } = state;
   const { gridSize, dots, walls } = level;
   const rows = gridSize;
   const cols = level.gridCols ?? gridSize;
