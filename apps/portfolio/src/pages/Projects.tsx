@@ -1,6 +1,6 @@
 import { Link } from "react-router-dom";
 import { Nav, ThemeToggle } from "@pv/ui";
-import { AVATAR_URL } from "@/lib/chat";
+import { useLogo } from "@/lib/useLogo";
 
 type Project = {
   name: string;
@@ -54,9 +54,10 @@ const projects: Project[] = [
 ];
 
 export default function Projects() {
+  const logo = useLogo();
   return (
     <>
-      <Nav name="Prasanna Vijayan" avatarUrl={AVATAR_URL} chip="AI Frontend Engineer · 10+ yrs">
+      <Nav name="Prasanna Vijayan" avatarUrl={logo} chip="AI Frontend Engineer · 10+ yrs">
         <Link className="nav-link" to="/" title="Home">
           <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
             <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" />

@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import { Link } from "react-router-dom";
 import { Nav, ThemeToggle } from "@pv/ui";
 import { ResumeModal } from "@/components/ResumeModal";
+import { useLogo } from "@/lib/useLogo";
 import {
   AVATAR_URL,
   SUGGESTIONS,
@@ -32,6 +33,7 @@ export default function Chat() {
   const [systemPrompt, setSystemPrompt] = useState("");
   const [resumeOpen, setResumeOpen] = useState(false);
 
+  const logo = useLogo();
   const messagesRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLTextAreaElement>(null);
 
@@ -74,7 +76,7 @@ export default function Chat() {
     <>
       <Nav
         name="Prasanna Vijayan"
-        avatarUrl={AVATAR_URL}
+        avatarUrl={logo}
         chip="AI Frontend Engineer · 10+ yrs"
       >
         <Link className="nav-link" to="/projects" title="Projects">

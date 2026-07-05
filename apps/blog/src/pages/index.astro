@@ -1,8 +1,14 @@
 ---
 // blog.prasannavijayan.in — index. Shares the design system via @pv/tokens.
 import "@pv/tokens/tokens.css";
-import faviconLight from "@pv/logos/pvy-blog-light.svg";
-import faviconDark from "@pv/logos/pvy-blog-dark.svg";
+import "@pv/ui/ui.css";
+import { Footer } from "@pv/ui";
+// `?url` → resolve to a URL string. Astro 5 otherwise imports SVGs as components.
+import faviconLight from "@pv/logos/pvy-blog-light.svg?url";
+import faviconDark from "@pv/logos/pvy-blog-dark.svg?url";
+
+// The blog page is always light, so use the light-theme (dark) badge as the brand.
+const brandLogo = faviconLight;
 
 const posts: { title: string; date: string; slug: string; excerpt: string }[] = [
   // Add posts here (or migrate to an Astro content collection).
@@ -26,7 +32,10 @@ const posts: { title: string; date: string; slug: string; excerpt: string }[] = 
   </head>
   <body>
     <header class="topnav">
-      <a class="brand" href="https://prasannavijayan.in">Prasanna <span>Vijayan</span></a>
+      <a class="brand" href="https://prasannavijayan.in">
+        <img class="brand-logo" src={brandLogo} alt="Pvy" />
+        <span class="brand-text">Prasanna <span>Vijayan</span></span>
+      </a>
       <span class="chip">Blog</span>
     </header>
 
@@ -51,6 +60,8 @@ const posts: { title: string; date: string; slug: string; excerpt: string }[] = 
       }
     </main>
 
+    <Footer name="Prasanna Vijayan" logoSrc={brandLogo} />
+
     <style>
       :global(*) { box-sizing: border-box; margin: 0; padding: 0; }
       :global(body) {
@@ -58,6 +69,8 @@ const posts: { title: string; date: string; slug: string; excerpt: string }[] = 
         background: var(--bg);
         color: var(--text-primary);
         min-height: 100vh;
+        display: flex;
+        flex-direction: column;
       }
       .topnav {
         display: flex;
@@ -68,13 +81,24 @@ const posts: { title: string; date: string; slug: string; excerpt: string }[] = 
         border-bottom: 1px solid var(--border);
       }
       .brand {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        text-decoration: none;
+      }
+      .brand-logo {
+        width: 28px;
+        height: 28px;
+        border-radius: 50%;
+        display: block;
+      }
+      .brand-text {
         font-family: "Google Sans", sans-serif;
         font-size: 18px;
         font-weight: 500;
         color: var(--text-primary);
-        text-decoration: none;
       }
-      .brand span { color: var(--accent); }
+      .brand-text span { color: var(--accent); }
       .chip {
         font-size: 11px;
         color: var(--text-secondary);
@@ -83,6 +107,8 @@ const posts: { title: string; date: string; slug: string; excerpt: string }[] = 
         border-radius: 20px;
       }
       main {
+        flex: 1;
+        width: 100%;
         max-width: 720px;
         margin: 0 auto;
         padding: 48px 20px;

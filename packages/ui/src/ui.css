@@ -108,3 +108,39 @@
     display: none;
   }
 }
+
+/* ─── FOOTER ─────────────────────────────────────────────────────────────────
+ * Uses @pv/tokens variables when available, with fallbacks so it also reads
+ * well in apps that don't import tokens (e.g. zipgame's dark theme). */
+.site-footer {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  flex-wrap: wrap;
+  padding: 20px 16px;
+  border-top: 1px solid var(--border, rgba(148, 163, 184, 0.18));
+  font-family: "Google Sans Text", sans-serif;
+  font-size: 12px;
+  color: var(--text-tertiary, #94a3b8);
+}
+
+.site-footer-logo {
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  display: block;
+}
+
+.site-footer-links {
+  display: flex;
+  gap: 14px;
+}
+
+.site-footer a {
+  color: var(--accent-text, #8ab4f8);
+  text-decoration: none;
+}
+.site-footer a:hover {
+  text-decoration: underline;
+}
