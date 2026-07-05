@@ -70,13 +70,19 @@ export async function sendChat(
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({
-      model: "claude-sonnet-4-20250514",
+      model: "claude-sonnet-4-6",
       max_tokens: 1000,
       system: systemPrompt,
       messages: messages.map((m) => ({ role: m.role, content: m.content })),
     }),
   });
   const data = await res.json();
+
+  if (!res.ok) {
+    const detail = data?.error?.message ?? data?.error ?? res.statusText;
+    throw new Error(typeof detail === "string" ? detail : "Chat request failed");
+  }
+
   return (
     data?.content?.[0]?.text ||
     "Sorry, I couldn't generate a response. Please try again."
