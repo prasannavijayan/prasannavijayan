@@ -81,7 +81,7 @@ export default defineToolbarApp({
       const took = record.completedAt ? fmt(record.completedAt - record.startedAt) : "—";
       const info = document.createElement("p");
       info.style.cssText = "margin:0 0 12px;font-size:13px;color:#188038;";
-      info.textContent = `✓ Recorded — ${took}`;
+      info.textContent = `✓ Published · reviewed in ${took}`;
       root.appendChild(info);
 
       const btn = makeButton("↻ Review again", "#5f6368");

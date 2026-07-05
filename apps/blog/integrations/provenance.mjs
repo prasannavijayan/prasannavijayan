@@ -3,6 +3,7 @@ import { readFileSync, writeFileSync, existsSync } from "node:fs";
 import path from "node:path";
 import {
   parseFrontmatter,
+  readField,
   setField,
   replaceFrontmatter,
   nowStamp,
@@ -51,13 +52,22 @@ export default function provenance() {
               const start = new Date(startedAt);
               const end = completedAt ? new Date(completedAt) : new Date();
               const took = formatDuration(end.getTime() - start.getTime());
+              const created = readField(fm.block, "created");
 
-              let block = setField(fm.block, "reviewStartedAt", nowStamp(start));
+              // Completing a review publishes the post: flip status + stamp the
+              // publish time, alongside the captured review timings. (The git hook
+              // remains a fallback for posts published by editing status by hand.)
+              let block = setField(fm.block, "status", "published");
+              block = setField(block, "publishedAt", nowStamp(end));
+              if (created) {
+                block = setField(block, "timeToPublish", formatDuration(end.getTime() - new Date(created).getTime()));
+              }
+              block = setField(block, "reviewStartedAt", nowStamp(start));
               block = setField(block, "reviewCompletedAt", nowStamp(end));
               block = setField(block, "reviewTook", took);
               writeFileSync(file, replaceFrontmatter(text, fm, block));
 
-              res.end(JSON.stringify({ ok: true, reviewTook: took }));
+              res.end(JSON.stringify({ ok: true, status: "published", reviewTook: took }));
             } catch (err) {
               res.statusCode = 400;
               res.end(JSON.stringify({ ok: false, error: err.message }));
