@@ -1,7 +1,8 @@
 # Netlify site base directory = apps/portfolio (set this in the site's build settings).
 # Paths below are relative to that base directory.
 [build]
-  publish = "."
+  command = "pnpm run build"
+  publish = "dist"
   functions = "netlify/functions"
   # Only rebuild the portfolio when its folder or a shared package changes.
   ignore = "git diff --quiet $CACHED_COMMIT_REF $COMMIT_REF -- ':/apps/portfolio' ':/packages'"
@@ -15,6 +16,7 @@
     X-Content-Type-Options = "nosniff"
 
 # ─── PROJECT SHORTLINK REDIRECTS ───────────────────────────────
+# These must come BEFORE the SPA catch-all so they win.
 # prasannavijayan.in/zip     → Zip game
 [[redirects]]
   from = "/zip"
@@ -28,3 +30,11 @@
   to = "https://fincorp.prasannavijayan.in"
   status = 302
   force = true
+
+# ─── SPA FALLBACK ───────────────────────────────────────────────
+# Client-side routing: serve index.html for any unmatched path.
+# (Netlify serves /.netlify/functions/* and real files before this.)
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200
