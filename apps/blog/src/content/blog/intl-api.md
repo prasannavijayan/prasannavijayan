@@ -2,10 +2,10 @@
 title: "The Intl API killed your date library"
 description: "Locale-aware dates, currency, plurals, and '3 hours ago' — built into the browser, zero dependencies."
 tags: ["javascript", "i18n"]
-status: draft
+status: published
 created: "2026-07-05T17:39:55"
-publishedAt: ""
-timeToPublish: ""
+publishedAt: "2026-07-05T21:48:03"
+timeToPublish: "4 hours"
 attribution: "AI written, Human reviewed"
 reviewStartedAt: "2026-07-05T21:41:32"
 reviewCompletedAt: "2026-07-05T21:46:45"
