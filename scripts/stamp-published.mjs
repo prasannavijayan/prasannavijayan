@@ -4,7 +4,7 @@
 // For every staged post under apps/blog/src/content/blog/ whose `status` is
 // `published` but `publishedAt` is still empty, this:
 //   • sets `publishedAt` to now (ISO, to the second)
-//   • sets `reviewTook` to the created → publishedAt span ("12 minutes" / "3 days")
+//   • sets `timeToPublish` to the created → publishedAt span ("12 minutes" / "3 hours" / "2 days")
 //   • re-stages the file so the stamps land in the same commit
 //
 // It never blocks a commit — on any error it logs and exits 0.
@@ -23,12 +23,14 @@ function nowStamp() {
   return `${d.getFullYear()}-${p(d.getMonth() + 1)}-${p(d.getDate())}T${p(d.getHours())}:${p(d.getMinutes())}:${p(d.getSeconds())}`;
 }
 
-/** Human-friendly span: minutes under a day, else days. */
-function formatReviewTook(fromISO, to) {
+/** Human-friendly span: minutes, then hours, then days. */
+function formatTimeToPublish(fromISO, to) {
   const ms = to.getTime() - new Date(fromISO).getTime();
   if (!Number.isFinite(ms) || ms < 0) return "";
   const days = Math.floor(ms / 86_400_000);
   if (days >= 1) return `${days} day${days === 1 ? "" : "s"}`;
+  const hours = Math.floor(ms / 3_600_000);
+  if (hours >= 1) return `${hours} hour${hours === 1 ? "" : "s"}`;
   const minutes = Math.round(ms / 60_000);
   return `${minutes} minute${minutes === 1 ? "" : "s"}`;
 }
@@ -60,14 +62,14 @@ try {
 
     const created = readField(block, "created");
     const stamp = nowStamp();
-    const took = created ? formatReviewTook(created, new Date()) : "";
+    const took = created ? formatTimeToPublish(created, new Date()) : "";
 
     let next = setField(block, "publishedAt", stamp);
-    next = setField(next, "reviewTook", took);
+    next = setField(next, "timeToPublish", took);
 
     writeFileSync(file, text.replace(fm[0], `---\n${next}\n---`));
     execSync(`git add ${JSON.stringify(file)}`);
-    console.log(`✓ published ${file} — publishedAt ${stamp}, review took ${took || "n/a"}`);
+    console.log(`✓ published ${file} — publishedAt ${stamp}, time to publish ${took || "n/a"}`);
   }
 } catch (err) {
   console.error("stamp-published: skipped (", err.message, ")");

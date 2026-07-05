@@ -27,7 +27,7 @@ const minutes = Math.max(1, Math.round(words / 200));
 
       <div class="post-meta">
         <span>{formatDate(post.data.publishedAt || post.data.created)} · {minutes} min read</span>
-        <Provenance attribution={post.data.attribution} reviewTook={post.data.reviewTook} />
+        <Provenance attribution={post.data.attribution} timeToPublish={post.data.timeToPublish} />
       </div>
 
       {

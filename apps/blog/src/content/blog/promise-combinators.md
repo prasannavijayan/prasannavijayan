@@ -5,7 +5,7 @@ tags: ["javascript", "async"]
 status: draft
 created: "2026-07-05T17:45:33"
 publishedAt: ""
-reviewTook: ""
+timeToPublish: ""
 attribution: "AI written, Human reviewed"
 ---
 

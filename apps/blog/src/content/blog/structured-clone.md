@@ -5,7 +5,7 @@ tags: ["javascript", "objects"]
 status: published
 created: "2026-07-05T17:02:05"
 publishedAt: "2026-07-05T20:39:56"
-reviewTook: "218 minutes"
+timeToPublish: "3 hours"
 attribution: "AI written, Human reviewed"
 ---
 

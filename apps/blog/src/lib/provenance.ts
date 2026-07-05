@@ -1,7 +1,7 @@
 import { z } from "astro:content";
 
 // ─────────────────────────────────────────────────────────────────────────────
-// Provenance — draft/publish status + review-time tracking for content.
+// Provenance — draft/publish status + time-to-publish tracking for content.
 //
 // This module is intentionally self-contained so it can be extracted into a
 // standalone package (e.g. `astro-provenance`) once the shape settles. Keep the
@@ -17,7 +17,7 @@ export const provenanceFields = {
   /** Filled by the hook when status flips to published (ISO, to the second). */
   publishedAt: z.string().default(""),
   /** Filled by the hook: created → publishedAt, e.g. "12 minutes" / "3 days". */
-  reviewTook: z.string().default(""),
+  timeToPublish: z.string().default(""),
   /** Human-readable authorship note. */
   attribution: z.string().default("AI written, Human reviewed"),
 };
@@ -31,12 +31,14 @@ export function isVisible(status: string): boolean {
   return import.meta.env.DEV || status === "published";
 }
 
-/** Human-friendly duration between two instants: minutes under a day, else days. */
-export function formatReviewTook(from: Date | string, to: Date | string): string {
+/** Human-friendly span between two instants: minutes, then hours, then days. */
+export function formatTimeToPublish(from: Date | string, to: Date | string): string {
   const ms = new Date(to).getTime() - new Date(from).getTime();
   if (!Number.isFinite(ms) || ms < 0) return "";
   const days = Math.floor(ms / 86_400_000);
   if (days >= 1) return `${days} day${days === 1 ? "" : "s"}`;
+  const hours = Math.floor(ms / 3_600_000);
+  if (hours >= 1) return `${hours} hour${hours === 1 ? "" : "s"}`;
   const minutes = Math.round(ms / 60_000);
   return `${minutes} minute${minutes === 1 ? "" : "s"}`;
 }

@@ -3,14 +3,14 @@
 // the human review took. Part of the future `astro-provenance` package.
 interface Props {
   attribution: string;
-  reviewTook?: string;
+  timeToPublish?: string;
 }
-const { attribution, reviewTook } = Astro.props;
+const { attribution, timeToPublish } = Astro.props;
 ---
 
 <span class="provenance">
   <span class="provenance-badge">{attribution}</span>
-  {reviewTook && <span class="provenance-took">reviewed in {reviewTook}</span>}
+  {timeToPublish && <span class="provenance-took">published {timeToPublish} after drafting</span>}
 </span>
 
 <style>

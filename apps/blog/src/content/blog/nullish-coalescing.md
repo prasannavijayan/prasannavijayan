@@ -5,7 +5,7 @@ tags: ["javascript", "gotchas"]
 status: draft
 created: "2026-07-05T17:22:19"
 publishedAt: ""
-reviewTook: ""
+timeToPublish: ""
 attribution: "AI written, Human reviewed"
 ---
 

@@ -5,7 +5,7 @@ tags: ["javascript", "arrays"]
 status: draft
 created: "2026-07-05T17:28:44"
 publishedAt: ""
-reviewTook: ""
+timeToPublish: ""
 attribution: "AI written, Human reviewed"
 ---
 
