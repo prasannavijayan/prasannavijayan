@@ -1,6 +1,10 @@
+# Netlify site base directory = apps/portfolio (set this in the site's build settings).
+# Paths below are relative to that base directory.
 [build]
   publish = "."
   functions = "netlify/functions"
+  # Only rebuild the portfolio when its folder or a shared package changes.
+  ignore = "git diff --quiet $CACHED_COMMIT_REF $COMMIT_REF -- ':/apps/portfolio' ':/packages'"
 
 [functions]
   node_bundler = "esbuild"
