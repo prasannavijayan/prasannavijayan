@@ -7,6 +7,9 @@ created: "2026-07-05T17:39:55"
 publishedAt: ""
 timeToPublish: ""
 attribution: "AI written, Human reviewed"
+reviewStartedAt: "2026-07-05T21:41:32"
+reviewCompletedAt: "2026-07-05T21:46:45"
+reviewTook: "5 minutes"
 ---
 
 Reach for a formatting library and you often pull in kilobytes to do things the platform already does. The `Intl` namespace is built into every modern runtime and handles locale-aware formatting for free.
@@ -79,6 +82,14 @@ function timeAgo(date) {
     }
   }
 }
+
+const now = Date.now();
+
+timeAgo(new Date(now - 86400 * 1000));        // "yesterday"
+timeAgo(new Date(now - 2 * 3600 * 1000));     // "2 hours ago"
+timeAgo(new Date(now - 5 * 60 * 1000));        // "5 minutes ago"
+timeAgo(new Date(now + 3 * 86400 * 1000));    // "in 3 days"
+timeAgo(new Date(now - 45 * 1000));           // "45 seconds ago"
 ```
 
 ## Plurals and lists
@@ -100,8 +111,28 @@ new Intl.ListFormat("en", { style: "long", type: "conjunction" })
 Constructing an `Intl.*` formatter isn't free. If you format in a loop or a hot render path, **create the formatter once and reuse it** rather than newing it up per call:
 
 ```js
+// ❌ slow — new formatter on every iteration
+rows.forEach((r) => {
+  render(new Intl.NumberFormat("en-US", { style: "currency", currency: "USD" }).format(r.total));
+});
+
+// ✅ create once, reuse
 const money = new Intl.NumberFormat("en-US", { style: "currency", currency: "USD" });
-rows.forEach((r) => render(money.format(r.total))); // reuse, don't re-create
+const rows = [{ total: 19.99 }, { total: 249.5 }, { total: 1200 }];
+
+rows.map((r) => money.format(r.total));
+// ["$19.99", "$249.50", "$1,200.00"]
+
+// same idea for dates in a list
+const dateFmt = new Intl.DateTimeFormat("en-US", { dateStyle: "medium" });
+
+const events = [
+  { name: "Shipped", at: new Date("2026-07-01") },
+  { name: "Delivered", at: new Date("2026-07-05") },
+];
+
+events.map((e) => `${e.name}: ${dateFmt.format(e.at)}`);
+// ["Shipped: Jul 1, 2026", "Delivered: Jul 5, 2026"]
 ```
 
 The takeaway: before installing a date or number library, check whether `Intl` already does it. For formatting — dates, currency, relative time, plurals, lists — it almost always does, in every locale, with nothing to ship.
