@@ -2,11 +2,11 @@
 import { getCollection, render } from "astro:content";
 import BlogLayout from "@/layouts/BlogLayout.astro";
 import Provenance from "@/components/Provenance.astro";
-import { formatDate } from "@/lib/provenance";
+import { formatDate, isVisible } from "@/lib/provenance";
 
 export async function getStaticPaths() {
-  // Only published posts get a page.
-  const posts = await getCollection("blog", (p) => p.data.status === "published");
+  // Dev: every post gets a page (draft preview). Production: only published.
+  const posts = await getCollection("blog", (p) => isVisible(p.data.status));
   return posts.map((post) => ({ params: { slug: post.id }, props: { post } }));
 }
 
@@ -22,6 +22,7 @@ const minutes = Math.max(1, Math.round(words / 200));
     <a class="back" href="/">← All posts</a>
 
     <article>
+      {post.data.status !== "published" && <span class="draft-flag">Draft preview</span>}
       <h1>{post.data.title}</h1>
 
       <div class="post-meta">
@@ -61,6 +62,19 @@ const minutes = Math.max(1, Math.round(words / 200));
       margin-bottom: 28px;
     }
     .back:hover { color: var(--accent-text); }
+    .draft-flag {
+      display: inline-block;
+      font-size: 10px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      color: #b26a00;
+      background: #fff3e0;
+      border: 1px solid #ffcc80;
+      padding: 2px 9px;
+      border-radius: 20px;
+      margin-bottom: 14px;
+    }
     article h1 {
       font-family: "Google Sans", sans-serif;
       font-size: 32px;

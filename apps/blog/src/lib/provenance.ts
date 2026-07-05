@@ -22,6 +22,15 @@ export const provenanceFields = {
   attribution: z.string().default("AI written, Human reviewed"),
 };
 
+/**
+ * Whether a post should be shown.
+ * In `astro dev` every post is visible (draft reading mode); a production build
+ * (`astro build`) shows only published posts.
+ */
+export function isVisible(status: string): boolean {
+  return import.meta.env.DEV || status === "published";
+}
+
 /** Human-friendly duration between two instants: minutes under a day, else days. */
 export function formatReviewTook(from: Date | string, to: Date | string): string {
   const ms = new Date(to).getTime() - new Date(from).getTime();

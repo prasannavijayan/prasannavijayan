@@ -2,10 +2,10 @@
 title: "structuredClone(): stop deep-copying with JSON"
 description: "The JSON.parse(JSON.stringify()) trick silently mangles your data. Here's the one-liner that replaces it."
 tags: ["javascript", "objects"]
-status: draft
+status: published
 created: "2026-07-05T17:02:05"
-publishedAt: ""
-reviewTook: ""
+publishedAt: "2026-07-05T20:39:56"
+reviewTook: "218 minutes"
 attribution: "AI written, Human reviewed"
 ---
 
@@ -34,8 +34,10 @@ const original = {
 const copy = JSON.parse(JSON.stringify(original));
 // {
 //   when: "2026-01-01T00:00:00.000Z"  ← Date became a string
-//   // count, tag, fn all gone
+//   // count, fn all gone
 //   // big: 10n throws! "Do not know how to serialize a BigInt"
+//   // tag: Symbol("id) throws! "Failed to execute 'structuredClone' 
+//      on 'Window': Symbol(id) could not be cloned"
 //   nested: { set: {} }               ← Set became an empty object
 // }
 ```
@@ -54,7 +56,7 @@ copy.nested.set instanceof Set;   // true
 copy.big === 10n;                 // true
 ```
 
-Dates stay Dates, `Set`/`Map`/`ArrayBuffer`/typed arrays survive, and `BigInt` is fine. It also handles **circular references**, which the JSON trick can't do at all:
+Dates stay Dates, `Set`/`Map`/`ArrayBuffer` typed arrays survive, and `BigInt` is fine. It also handles **circular references**, which the JSON trick can't do at all:
 
 ```js
 const a = {};
@@ -65,10 +67,19 @@ structuredClone(a);    // ✅ works, copy.self === copy
 
 ## Where it stops
 
-`structuredClone` copies data, not behavior. Two things it won't do:
+`structuredClone` copies data, not behavior. A few things it won't do:
 
 - **Functions** throw a `DataCloneError`. So do DOM nodes.
+- **Symbols are dropped or throw** — symbol-keyed properties are silently omitted from the clone. A bare `Symbol` value (or one as a `Map` key or array element) throws.
 - **Class instances lose their prototype** — you get a plain object with the same fields, not an instance of your class.
+
+```js
+const original = { id: 1, [Symbol("tag")]: "secret" };
+const copy = structuredClone(original);
+// { id: 1 } — the symbol property is gone
+
+structuredClone(Symbol("x")); // ❌ DataCloneError
+```
 
 ```js
 class Point { constructor(x) { this.x = x; } }
@@ -82,6 +93,6 @@ If you need methods or the prototype chain preserved, `structuredClone` isn't yo
 
 - Copying **plain data** (config, API responses, state)? Use `structuredClone`.
 - Copying **one level** shallowly? `{ ...obj }` or `structuredClone` are both fine — but remember spread only copies the top level.
-- Copying things with **methods, DOM nodes, or class identity**? Neither the JSON trick nor `structuredClone` fits; handle it explicitly.
+- Copying things with **methods, DOM nodes, symbols, or class identity**? Neither the JSON trick nor `structuredClone` fits; handle it explicitly.
 
 The takeaway: `JSON.parse(JSON.stringify(x))` was always a workaround for a missing primitive. That primitive now exists. Delete the trick.
