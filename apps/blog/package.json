@@ -1,0 +1,20 @@
+{
+  "name": "blog",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "astro dev",
+    "build": "astro build",
+    "preview": "astro preview"
+  },
+  "dependencies": {
+    "@astrojs/react": "^4.2.0",
+    "@pv/logos": "workspace:*",
+    "@pv/tokens": "workspace:*",
+    "@pv/ui": "workspace:*",
+    "astro": "^5.0.0",
+    "react": "^19.2.4",
+    "react-dom": "^19.2.4"
+  }
+}

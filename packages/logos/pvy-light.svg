@@ -1,0 +1,7 @@
+<svg viewBox="0 0 400 400" width="400" height="400" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <style>@import url('https://fonts.googleapis.com/css2?family=Dancing+Script:wght@700&amp;display=swap');</style>
+  </defs>
+  <circle cx="200" cy="200" r="196" fill="#0d0d0d" />
+  <text x="202" y="232" text-anchor="middle" font-family="'Dancing Script', cursive" font-weight="700" font-size="148" fill="#f2f2f2" letter-spacing="2">Pvy</text>
+</svg>

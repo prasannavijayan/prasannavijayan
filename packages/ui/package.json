@@ -1,0 +1,19 @@
+{
+  "name": "@pv/ui",
+  "version": "0.0.0",
+  "private": true,
+  "description": "Shared UI components (Nav, ThemeToggle) for prasannavijayan.in.",
+  "type": "module",
+  "exports": {
+    ".": "./src/index.ts",
+    "./ui.css": "./src/ui.css"
+  },
+  "peerDependencies": {
+    "react": ">=18",
+    "react-dom": ">=18"
+  },
+  "devDependencies": {
+    "@types/react": "^19.2.14",
+    "@types/react-dom": "^19.2.3"
+  }
+}

@@ -1,0 +1,17 @@
+# dependencies
+node_modules/
+.pnpm-store/
+
+# build output
+dist/
+.astro/
+.netlify/
+
+# os / editor
+.DS_Store
+.claude/
+
+# env
+.env
+.env.*
+!.env.example

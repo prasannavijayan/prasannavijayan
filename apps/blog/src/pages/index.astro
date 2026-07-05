@@ -1,0 +1,139 @@
+---
+// blog.prasannavijayan.in — index. Shares the design system via @pv/tokens.
+import "@pv/tokens/tokens.css";
+import "@pv/ui/ui.css";
+import { Footer } from "@pv/ui";
+// `?url` → resolve to a URL string. Astro 5 otherwise imports SVGs as components.
+import faviconLight from "@pv/logos/pvy-blog-light.svg?url";
+import faviconDark from "@pv/logos/pvy-blog-dark.svg?url";
+
+// The blog page is always light, so use the light-theme (dark) badge as the brand.
+const brandLogo = faviconLight;
+
+const posts: { title: string; date: string; slug: string; excerpt: string }[] = [
+  // Add posts here (or migrate to an Astro content collection).
+];
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Prasanna Vijayan — Blog</title>
+    <link rel="icon" type="image/svg+xml" href={faviconLight} media="(prefers-color-scheme: light)" />
+    <link rel="icon" type="image/svg+xml" href={faviconDark} media="(prefers-color-scheme: dark)" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Google+Sans:wght@400;500;600&family=Google+Sans+Text:wght@400;500&family=Roboto:wght@300;400;500&display=swap"
+      rel="stylesheet"
+    />
+  </head>
+  <body>
+    <header class="topnav">
+      <a class="brand" href="https://prasannavijayan.in">
+        <img class="brand-logo" src={brandLogo} alt="Pvy" />
+        <span class="brand-text">Prasanna <span>Vijayan</span></span>
+      </a>
+      <span class="chip">Blog</span>
+    </header>
+
+    <main>
+      <h1>Writing</h1>
+      {
+        posts.length === 0 ? (
+          <p class="empty">No posts yet — coming soon.</p>
+        ) : (
+          <ul class="post-list">
+            {posts.map((p) => (
+              <li>
+                <a href={`/${p.slug}`}>
+                  <span class="post-title">{p.title}</span>
+                  <span class="post-date">{p.date}</span>
+                  <span class="post-excerpt">{p.excerpt}</span>
+                </a>
+              </li>
+            ))}
+          </ul>
+        )
+      }
+    </main>
+
+    <Footer name="Prasanna Vijayan" logoSrc={brandLogo} />
+
+    <style>
+      :global(*) { box-sizing: border-box; margin: 0; padding: 0; }
+      :global(body) {
+        font-family: "Roboto", "Google Sans Text", sans-serif;
+        background: var(--bg);
+        color: var(--text-primary);
+        min-height: 100vh;
+        display: flex;
+        flex-direction: column;
+      }
+      .topnav {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        height: 64px;
+        padding: 0 20px;
+        border-bottom: 1px solid var(--border);
+      }
+      .brand {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        text-decoration: none;
+      }
+      .brand-logo {
+        width: 28px;
+        height: 28px;
+        border-radius: 50%;
+        display: block;
+      }
+      .brand-text {
+        font-family: "Google Sans", sans-serif;
+        font-size: 18px;
+        font-weight: 500;
+        color: var(--text-primary);
+      }
+      .brand-text span { color: var(--accent); }
+      .chip {
+        font-size: 11px;
+        color: var(--text-secondary);
+        background: var(--bg-tertiary);
+        padding: 4px 10px;
+        border-radius: 20px;
+      }
+      main {
+        flex: 1;
+        width: 100%;
+        max-width: 720px;
+        margin: 0 auto;
+        padding: 48px 20px;
+      }
+      h1 {
+        font-family: "Google Sans", sans-serif;
+        font-size: 30px;
+        font-weight: 500;
+        margin-bottom: 24px;
+      }
+      .empty { color: var(--text-secondary); }
+      .post-list { list-style: none; display: flex; flex-direction: column; gap: 12px; }
+      .post-list a {
+        display: block;
+        padding: 20px;
+        border: 1px solid var(--border);
+        border-radius: var(--radius-sm);
+        text-decoration: none;
+        color: inherit;
+        transition: border-color 0.15s, box-shadow 0.15s;
+      }
+      .post-list a:hover { border-color: var(--accent); box-shadow: var(--shadow-md); }
+      .post-title { display: block; font-weight: 500; font-size: 17px; }
+      .post-date { display: block; font-size: 12px; color: var(--text-tertiary); margin: 4px 0 8px; }
+      .post-excerpt { display: block; font-size: 14px; color: var(--text-secondary); line-height: 1.6; }
+    </style>
+  </body>
+</html>

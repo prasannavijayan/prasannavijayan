@@ -1,0 +1,11 @@
+# Netlify site base directory = apps/zip (set this in the site's build settings).
+[build]
+  command = "pnpm run build"
+  publish = "dist"
+  # Only rebuild zip when its folder or a shared package changes.
+  ignore = "git diff --quiet $CACHED_COMMIT_REF $COMMIT_REF -- ':/apps/zip' ':/packages'"
+
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200
