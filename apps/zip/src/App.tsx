@@ -97,7 +97,11 @@ export default function App() {
   }
 
   if (!user) {
-    return <AuthScreen onSignIn={signInWithGoogle} error={authError} />;
+    return (
+      <div className="bg-[--color-bg]">
+        <AuthScreen onSignIn={signInWithGoogle} error={authError} />
+      </div>
+    );
   }
 
   if (progressLoading && !progressError) {
@@ -117,7 +121,7 @@ export default function App() {
   // Zoom-in transition overlay (menu → game)
   if (transition === "zoom-in") {
     return (
-      <div className="min-h-screen bg-bg page-zoom-in">
+      <div className="h-[calc(100vh-60px)] bg-bg page-zoom-in">
         <div className="flex flex-col items-center justify-center min-h-screen p-4">
           <div className="text-center">
             <h2 className="text-3xl font-bold text-white mb-2">
@@ -135,7 +139,7 @@ export default function App() {
   // Zoom-out transition (game → menu)
   if (transition === "zoom-out" && currentLevel) {
     return (
-      <div className="min-h-screen bg-bg page-zoom-out">
+      <div className="h-[calc(100vh-60px)] bg-bg page-zoom-out">
         <Game
           level={currentLevel}
           uid={user.uid}
@@ -151,7 +155,7 @@ export default function App() {
 
   if (screen === "menu" || !currentLevel) {
     return (
-      <div className="page-enter-menu">
+      <div className="page-enter-menu h-[calc(100vh-60px)]">
         <LevelSelect
           onSelectLevel={handleSelectLevel}
           onSignOut={signOut}
@@ -163,14 +167,16 @@ export default function App() {
   }
 
   return (
-    <Game
-      level={currentLevel}
-      uid={user.uid}
-      displayName={user.displayName ?? user.email ?? "Anonymous"}
-      userEmail={user.email ?? undefined}
-      onBack={handleBack}
-      onNextLevel={handleNextLevel}
-      onSignOut={signOut}
-    />
+    <div className="h-[calc(100vh-60px)]">
+      <Game
+        level={currentLevel}
+        uid={user.uid}
+        displayName={user.displayName ?? user.email ?? "Anonymous"}
+        userEmail={user.email ?? undefined}
+        onBack={handleBack}
+        onNextLevel={handleNextLevel}
+        onSignOut={signOut}
+      />
+    </div>
   );
 }
