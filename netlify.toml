@@ -9,3 +9,18 @@
   for = "/*"
   [headers.values]
     X-Content-Type-Options = "nosniff"
+
+# ─── PROJECT SHORTLINK REDIRECTS ───────────────────────────────
+# prasannavijayan.in/zip     → Zip game
+[[redirects]]
+  from = "/zip"
+  to = "https://zip.prasannavijayan.in"
+  status = 302
+  force = true
+
+# prasannavijayan.in/fincorp → SpendAnalyser dashboard
+[[redirects]]
+  from = "/fincorp"
+  to = "https://fincorp.prasannavijayan.in"
+  status = 302
+  force = true
