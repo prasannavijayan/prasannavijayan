@@ -2,11 +2,14 @@
 title: "Array methods you're still writing by hand"
 description: "at(), findLast(), flatMap(), and Object.groupBy() replace loops you probably still write. A quick tour."
 tags: ["javascript", "arrays"]
-status: draft
+status: published
 created: "2026-07-05T17:28:44"
-publishedAt: ""
-timeToPublish: ""
+publishedAt: "2026-07-05T21:54:46"
+timeToPublish: "4 hours"
 attribution: "AI written, Human reviewed"
+reviewStartedAt: "2026-07-05T21:49:04"
+reviewCompletedAt: "2026-07-05T21:54:08"
+reviewTook: "5 minutes"
 ---
 
 The `Array` prototype quietly grew some genuinely useful methods over the last few years. Here are four that delete boilerplate you're probably still writing.
