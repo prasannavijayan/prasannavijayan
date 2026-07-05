@@ -8,6 +8,7 @@
     "dev:portfolio": "pnpm --filter portfolio dev",
     "dev:blog": "pnpm --filter blog dev",
     "dev:zip": "pnpm --filter zipgame dev",
-    "build": "pnpm -r build"
+    "build": "pnpm -r build",
+    "prepare": "git config core.hooksPath .githooks || true"
   }
 }

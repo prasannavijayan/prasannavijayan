@@ -1,0 +1,143 @@
+---
+import { getCollection, render } from "astro:content";
+import BlogLayout from "@/layouts/BlogLayout.astro";
+import Provenance from "@/components/Provenance.astro";
+import { formatDate } from "@/lib/provenance";
+
+export async function getStaticPaths() {
+  // Only published posts get a page.
+  const posts = await getCollection("blog", (p) => p.data.status === "published");
+  return posts.map((post) => ({ params: { slug: post.id }, props: { post } }));
+}
+
+const { post } = Astro.props;
+const { Content } = await render(post);
+
+const words = (post.body ?? "").split(/\s+/).filter(Boolean).length;
+const minutes = Math.max(1, Math.round(words / 200));
+---
+
+<BlogLayout title={`${post.data.title} — Prasanna Vijayan`} description={post.data.description}>
+  <main>
+    <a class="back" href="/">← All posts</a>
+
+    <article>
+      <h1>{post.data.title}</h1>
+
+      <div class="post-meta">
+        <span>{formatDate(post.data.publishedAt || post.data.created)} · {minutes} min read</span>
+        <Provenance attribution={post.data.attribution} reviewTook={post.data.reviewTook} />
+      </div>
+
+      {
+        post.data.tags.length > 0 && (
+          <div class="tags">
+            {post.data.tags.map((t) => (
+              <span class="tag">{t}</span>
+            ))}
+          </div>
+        )
+      }
+
+      <div class="prose">
+        <Content />
+      </div>
+    </article>
+  </main>
+
+  <style>
+    main {
+      flex: 1;
+      width: 100%;
+      max-width: 720px;
+      margin: 0 auto;
+      padding: 40px 20px 64px;
+    }
+    .back {
+      display: inline-block;
+      font-size: 13px;
+      color: var(--text-secondary);
+      text-decoration: none;
+      margin-bottom: 28px;
+    }
+    .back:hover { color: var(--accent-text); }
+    article h1 {
+      font-family: "Google Sans", sans-serif;
+      font-size: 32px;
+      font-weight: 500;
+      line-height: 1.2;
+      margin-bottom: 14px;
+    }
+    .post-meta {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      flex-wrap: wrap;
+      font-size: 12px;
+      color: var(--text-tertiary);
+      margin-bottom: 14px;
+    }
+    .tags { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 32px; }
+    .tag {
+      font-size: 11px;
+      color: var(--text-secondary);
+      background: var(--bg-tertiary);
+      padding: 3px 10px;
+      border-radius: 20px;
+    }
+  </style>
+
+  <style is:global>
+    .prose { font-size: 16px; line-height: 1.75; color: var(--text-primary); }
+    .prose p { margin: 0 0 18px; }
+    .prose h2 {
+      font-family: "Google Sans", sans-serif;
+      font-size: 22px;
+      font-weight: 500;
+      margin: 36px 0 12px;
+    }
+    .prose ul, .prose ol { margin: 0 0 18px; padding-left: 22px; }
+    .prose li { margin-bottom: 6px; }
+    .prose a { color: var(--accent-text); }
+    .prose strong { font-weight: 600; }
+    .prose code {
+      font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+      font-size: 0.88em;
+      background: var(--bg-tertiary);
+      padding: 2px 6px;
+      border-radius: 6px;
+    }
+    .prose pre {
+      background: var(--bg-secondary);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      padding: 16px;
+      overflow-x: auto;
+      margin: 0 0 20px;
+    }
+    .prose pre code {
+      background: none;
+      padding: 0;
+      font-size: 13.5px;
+      line-height: 1.6;
+    }
+    .prose table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 0 0 20px;
+      font-size: 14px;
+    }
+    .prose th, .prose td {
+      border: 1px solid var(--border);
+      padding: 8px 12px;
+      text-align: left;
+    }
+    .prose th { background: var(--bg-secondary); font-weight: 500; }
+    .prose blockquote {
+      border-left: 3px solid var(--accent);
+      padding-left: 16px;
+      margin: 0 0 18px;
+      color: var(--text-secondary);
+    }
+  </style>
+</BlogLayout>

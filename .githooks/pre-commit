@@ -1,0 +1,3 @@
+#!/bin/sh
+# Stamp blog posts transitioning draft → published (see scripts/stamp-published.mjs).
+node scripts/stamp-published.mjs
