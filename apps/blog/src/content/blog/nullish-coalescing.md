@@ -2,11 +2,14 @@
 title: "?? is not ||: the bug that ships to prod"
 description: "Nullish coalescing looks like a fancy OR. The difference is exactly the bug that survives code review."
 tags: ["javascript", "gotchas"]
-status: draft
+status: published
 created: "2026-07-05T17:22:19"
-publishedAt: ""
-timeToPublish: ""
+publishedAt: "2026-07-05T22:00:11"
+timeToPublish: "4 hours"
 attribution: "AI written, Human reviewed"
+reviewStartedAt: "2026-07-05T21:56:44"
+reviewCompletedAt: "2026-07-05T21:59:23"
+reviewTook: "3 minutes"
 ---
 
 You've seen `||` used for defaults forever:
