@@ -1,0 +1,10 @@
+{
+  "name": "@pv/logos",
+  "version": "0.0.0",
+  "private": true,
+  "description": "Brand logos & favicons for prasannavijayan.in — theme (dark/light) and blog variants.",
+  "exports": {
+    "./*": "./*"
+  },
+  "files": ["*.svg", "*.ico"]
+}

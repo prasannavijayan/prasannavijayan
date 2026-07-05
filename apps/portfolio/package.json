@@ -9,6 +9,7 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@pv/logos": "workspace:*",
     "@pv/tokens": "workspace:*",
     "@pv/ui": "workspace:*",
     "react": "^19.2.4",

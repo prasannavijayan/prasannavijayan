@@ -1,6 +1,8 @@
 ---
 // blog.prasannavijayan.in — index. Shares the design system via @pv/tokens.
 import "@pv/tokens/tokens.css";
+import faviconLight from "@pv/logos/pvy-blog-light.svg";
+import faviconDark from "@pv/logos/pvy-blog-dark.svg";
 
 const posts: { title: string; date: string; slug: string; excerpt: string }[] = [
   // Add posts here (or migrate to an Astro content collection).
@@ -13,6 +15,8 @@ const posts: { title: string; date: string; slug: string; excerpt: string }[] = 
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Prasanna Vijayan — Blog</title>
+    <link rel="icon" type="image/svg+xml" href={faviconLight} media="(prefers-color-scheme: light)" />
+    <link rel="icon" type="image/svg+xml" href={faviconDark} media="(prefers-color-scheme: dark)" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link

@@ -10,6 +10,9 @@ importers:
 
   apps/blog:
     dependencies:
+      '@pv/logos':
+        specifier: workspace:*
+        version: link:../../packages/logos
       '@pv/tokens':
         specifier: workspace:*
         version: link:../../packages/tokens
@@ -19,6 +22,9 @@ importers:
 
   apps/portfolio:
     dependencies:
+      '@pv/logos':
+        specifier: workspace:*
+        version: link:../../packages/logos
       '@pv/tokens':
         specifier: workspace:*
         version: link:../../packages/tokens
@@ -123,6 +129,8 @@ importers:
       vite-plugin-pwa:
         specifier: ^1.2.0
         version: 1.3.0(vite@8.1.3(@types/node@24.13.2)(esbuild@0.27.7)(jiti@2.7.0)(terser@5.48.0))(workbox-build@7.4.1)(workbox-window@7.4.1)
+
+  packages/logos: {}
 
   packages/tokens: {}
 

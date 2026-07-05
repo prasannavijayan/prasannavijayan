@@ -9,6 +9,7 @@
     "preview": "astro preview"
   },
   "dependencies": {
+    "@pv/logos": "workspace:*",
     "@pv/tokens": "workspace:*",
     "astro": "^5.0.0"
   }
