@@ -9,8 +9,11 @@ import faviconDark from "@pv/logos/pvy-blog-dark.svg?url";
 interface Props {
   title: string;
   description?: string;
+  // When rendering a single post, expose it to the dev Review Timer toolbar app.
+  postSlug?: string;
+  postStatus?: string;
 }
-const { title, description } = Astro.props;
+const { title, description, postSlug, postStatus } = Astro.props;
 const brandLogo = faviconLight;
 ---
 
@@ -30,7 +33,7 @@ const brandLogo = faviconLight;
       rel="stylesheet"
     />
   </head>
-  <body>
+  <body data-post-slug={postSlug} data-post-status={postStatus}>
     <header class="topnav">
       <a class="brand" href="https://prasannavijayan.in">
         <img class="brand-logo" src={brandLogo} alt="Pvy" />

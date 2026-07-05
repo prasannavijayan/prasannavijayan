@@ -1,16 +1,23 @@
 ---
-// Provenance badge — shows authorship attribution and (once published) how long
-// the human review took. Part of the future `astro-provenance` package.
+// Provenance badge — authorship attribution + how the timing was measured.
+// Prefers the actual review time (reviewTook); falls back to time-to-publish.
 interface Props {
   attribution: string;
+  reviewTook?: string;
   timeToPublish?: string;
 }
-const { attribution, timeToPublish } = Astro.props;
+const { attribution, reviewTook, timeToPublish } = Astro.props;
+
+const timing = reviewTook
+  ? `reviewed in ${reviewTook}`
+  : timeToPublish
+    ? `published ${timeToPublish} after drafting`
+    : "";
 ---
 
 <span class="provenance">
   <span class="provenance-badge">{attribution}</span>
-  {timeToPublish && <span class="provenance-took">published {timeToPublish} after drafting</span>}
+  {timing && <span class="provenance-took">{timing}</span>}
 </span>
 
 <style>

@@ -4,47 +4,27 @@
 // For every staged post under apps/blog/src/content/blog/ whose `status` is
 // `published` but `publishedAt` is still empty, this:
 //   • sets `publishedAt` to now (ISO, to the second)
-//   • sets `timeToPublish` to the created → publishedAt span ("12 minutes" / "3 hours" / "2 days")
+//   • sets `timeToPublish` to the created → publishedAt span (fallback metric)
 //   • re-stages the file so the stamps land in the same commit
 //
-// It never blocks a commit — on any error it logs and exits 0.
+// It never touches `reviewTook` — that's the *actual* review time captured by
+// the dev Review Timer (apps/blog/integrations/provenance.mjs). The badge prefers
+// reviewTook and falls back to timeToPublish.
 //
-// (Slated to become the `astro-provenance` package's git hook once the shape settles.)
+// It never blocks a commit — on any error it logs and exits 0.
 
 import { execSync } from "node:child_process";
 import { readFileSync, writeFileSync } from "node:fs";
+import {
+  parseFrontmatter,
+  readField,
+  setField,
+  replaceFrontmatter,
+  nowStamp,
+  formatDuration,
+} from "./frontmatter.mjs";
 
 const CONTENT_DIR = "apps/blog/src/content/blog/";
-
-/** Local ISO timestamp with seconds, e.g. "2026-07-05T17:04:22". */
-function nowStamp() {
-  const d = new Date();
-  const p = (n) => String(n).padStart(2, "0");
-  return `${d.getFullYear()}-${p(d.getMonth() + 1)}-${p(d.getDate())}T${p(d.getHours())}:${p(d.getMinutes())}:${p(d.getSeconds())}`;
-}
-
-/** Human-friendly span: minutes, then hours, then days. */
-function formatTimeToPublish(fromISO, to) {
-  const ms = to.getTime() - new Date(fromISO).getTime();
-  if (!Number.isFinite(ms) || ms < 0) return "";
-  const days = Math.floor(ms / 86_400_000);
-  if (days >= 1) return `${days} day${days === 1 ? "" : "s"}`;
-  const hours = Math.floor(ms / 3_600_000);
-  if (hours >= 1) return `${hours} hour${hours === 1 ? "" : "s"}`;
-  const minutes = Math.round(ms / 60_000);
-  return `${minutes} minute${minutes === 1 ? "" : "s"}`;
-}
-
-function setField(frontmatter, key, value) {
-  const line = `${key}: "${value}"`;
-  const re = new RegExp(`^${key}:.*$`, "m");
-  return re.test(frontmatter) ? frontmatter.replace(re, line) : `${frontmatter}\n${line}`;
-}
-
-function readField(frontmatter, key) {
-  const m = frontmatter.match(new RegExp(`^${key}:\\s*(.*)$`, "m"));
-  return m ? m[1].trim().replace(/^["']|["']$/g, "") : undefined;
-}
 
 try {
   const staged = execSync("git diff --cached --name-only --diff-filter=ACM", { encoding: "utf8" })
@@ -53,21 +33,20 @@ try {
 
   for (const file of staged) {
     const text = readFileSync(file, "utf8");
-    const fm = text.match(/^---\r?\n([\s\S]*?)\r?\n---/);
+    const fm = parseFrontmatter(text);
     if (!fm) continue;
 
-    const block = fm[1];
-    if (readField(block, "status") !== "published") continue;
-    if (readField(block, "publishedAt")) continue; // already stamped
+    if (readField(fm.block, "status") !== "published") continue;
+    if (readField(fm.block, "publishedAt")) continue; // already stamped
 
-    const created = readField(block, "created");
+    const created = readField(fm.block, "created");
     const stamp = nowStamp();
-    const took = created ? formatTimeToPublish(created, new Date()) : "";
+    const took = created ? formatDuration(Date.now() - new Date(created).getTime()) : "";
 
-    let next = setField(block, "publishedAt", stamp);
-    next = setField(next, "timeToPublish", took);
+    let block = setField(fm.block, "publishedAt", stamp);
+    block = setField(block, "timeToPublish", took);
 
-    writeFileSync(file, text.replace(fm[0], `---\n${next}\n---`));
+    writeFileSync(file, replaceFrontmatter(text, fm, block));
     execSync(`git add ${JSON.stringify(file)}`);
     console.log(`✓ published ${file} — publishedAt ${stamp}, time to publish ${took || "n/a"}`);
   }
