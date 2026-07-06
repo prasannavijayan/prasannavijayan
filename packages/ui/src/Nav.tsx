@@ -2,15 +2,15 @@ import { useState } from "react";
 import type { ReactNode } from "react";
 
 type NavProps = {
-  /** Full name, e.g. "Prasanna Vijayan". The last word is accent-colored. */
+  /** Full name, used as alt/aria text for the logo — no longer rendered as visible text. */
   name: string;
   avatarUrl?: string;
   /** Where the logo links to. Defaults to the site root. */
   homeHref?: string;
-  /** Small pill rendered on the left, after the name. */
-  chip?: ReactNode;
-  /** Right-side actions (links, buttons, <ThemeToggle/>). */
-  children?: ReactNode;
+  /** Center nav links (Home, Projects, Blog, ...). */
+  links?: ReactNode;
+  /** Right-side actions, e.g. <ThemeToggle/>. */
+  actions?: ReactNode;
 };
 
 function initials(name: string): string {
@@ -34,22 +34,14 @@ function Avatar({ name, avatarUrl }: { name: string; avatarUrl?: string }) {
   );
 }
 
-export function Nav({ name, avatarUrl, homeHref = "/", chip, children }: NavProps) {
-  const parts = name.trim().split(/\s+/);
-  const last = parts.length > 1 ? parts.pop() : undefined;
-  const first = parts.join(" ");
-
+export function Nav({ name, avatarUrl, homeHref = "/", links, actions }: NavProps) {
   return (
     <nav className="topnav">
-      <a className="nav-logo" href={homeHref}>
+      <a className="nav-logo" href={homeHref} aria-label={name} title={name}>
         <Avatar name={name} avatarUrl={avatarUrl} />
-        <span className="nav-name">
-          {first} {last && <span>{last}</span>}
-        </span>
       </a>
-      {chip && <div className="nav-chip">{chip}</div>}
-      <div className="nav-spacer" />
-      {children}
+      {links && <div className="nav-links">{links}</div>}
+      {actions && <div className="nav-actions">{actions}</div>}
     </nav>
   );
 }

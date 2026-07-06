@@ -15,7 +15,6 @@ interface Props {
   postStatus?: string;
 }
 const { title, description, postSlug, postStatus } = Astro.props;
-const brandLogo = faviconLight;
 ---
 
 <!doctype html>
@@ -48,7 +47,7 @@ const brandLogo = faviconLight;
 
     <slot />
 
-    <Footer name="Prasanna Vijayan" logoSrc={brandLogo} />
+    <Footer client:load variant="blog" rssUrl="/rss.xml" />
 
     <style>
       :global(*) { box-sizing: border-box; margin: 0; padding: 0; }

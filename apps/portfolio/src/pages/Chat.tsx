@@ -1,8 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { Link } from "react-router-dom";
-import { Nav, ThemeToggle } from "@pv/ui";
-import { ResumeModal } from "@/components/ResumeModal";
-import { RoleChip } from "@/components/RoleChip";
+import { Nav, ResumeModal, ThemeToggle } from "@pv/ui";
 import { useLogo } from "@/lib/useLogo";
 import {
   AVATAR_URL,
@@ -78,31 +76,33 @@ export default function Chat() {
       <Nav
         name="Prasanna Vijayan"
         avatarUrl={logo}
-        chip={<RoleChip onResumeClick={() => setResumeOpen(true)} />}
-      >
-        <Link className="nav-link active" to="/" title="Home">
-          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-            <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" />
-            <polyline points="9 22 9 12 15 12 15 22" />
-          </svg>
-          <span>Home</span>
-        </Link>
-        <Link className="nav-link" to="/projects" title="Projects">
-          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-            <polyline points="16 18 22 12 16 6" />
-            <polyline points="8 6 2 12 8 18" />
-          </svg>
-          <span>Projects</span>
-        </Link>
-        <a className="nav-link" href="https://blog.prasannavijayan.in" title="Blog">
-          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-            <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20" />
-            <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z" />
-          </svg>
-          <span>Blog</span>
-        </a>
-        <ThemeToggle />
-      </Nav>
+        links={
+          <>
+            <Link className="nav-link active" to="/" title="Home">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" />
+                <polyline points="9 22 9 12 15 12 15 22" />
+              </svg>
+              <span>Home</span>
+            </Link>
+            <Link className="nav-link" to="/projects" title="Projects">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <polyline points="16 18 22 12 16 6" />
+                <polyline points="8 6 2 12 8 18" />
+              </svg>
+              <span>Projects</span>
+            </Link>
+            <a className="nav-link" href="https://blog.prasannavijayan.in" title="Blog">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20" />
+                <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z" />
+              </svg>
+              <span>Blog</span>
+            </a>
+          </>
+        }
+        actions={<ThemeToggle />}
+      />
 
       <div className="main">
         <div className={`messages${isEmpty ? " is-empty" : ""}`} ref={messagesRef}>
@@ -190,8 +190,18 @@ export default function Chat() {
             </button>
           </div>
           <div className="input-footer">
-            Answers based on Prasanna's resume &amp; context &nbsp;·&nbsp;
-            <a href="mailto:prasannavijayan.tm@gmail.com">Get in touch</a>
+            <span>
+              Answers based on Prasanna's resume &amp; context &nbsp;·&nbsp;
+              <a href="mailto:prasannavijayan.tm@gmail.com">Get in touch</a>
+            </span>
+            <button type="button" className="input-footer-resume" onClick={() => setResumeOpen(true)}>
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+                <polyline points="7 10 12 15 17 10" />
+                <line x1="12" y1="15" x2="12" y2="3" />
+              </svg>
+              Resume
+            </button>
           </div>
         </div>
       </div>

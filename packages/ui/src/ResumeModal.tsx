@@ -43,7 +43,7 @@ export function ResumeModal({ open, onClose }: { open: boolean; onClose: () => v
           </div>
         </div>
         <div className="pdf-modal-body">
-          {open && <iframe src="/Resume.pdf" title="Prasanna Vijayan Resume" />}
+          {open && <iframe src="/Resume.pdf" title="Resume" />}
         </div>
       </div>
     </div>
