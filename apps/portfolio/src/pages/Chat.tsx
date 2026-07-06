@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { Link } from "react-router-dom";
-import { Nav, ResumeModal, ThemeToggle } from "@pv/ui";
+import { Nav, NavLabel, navLinkClass, ResumeModal, ThemeToggle } from "@pv/ui";
 import { useLogo } from "@/lib/useLogo";
 import {
   AVATAR_URL,
@@ -78,26 +78,26 @@ export default function Chat() {
         avatarUrl={logo}
         links={
           <>
-            <Link className="nav-link active" to="/" title="Home">
+            <Link className={navLinkClass(true)} to="/" title="Home">
               <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                 <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" />
                 <polyline points="9 22 9 12 15 12 15 22" />
               </svg>
-              <span>Home</span>
+              <NavLabel>Home</NavLabel>
             </Link>
-            <Link className="nav-link" to="/projects" title="Projects">
+            <Link className={navLinkClass()} to="/projects" title="Projects">
               <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                 <polyline points="16 18 22 12 16 6" />
                 <polyline points="8 6 2 12 8 18" />
               </svg>
-              <span>Projects</span>
+              <NavLabel>Projects</NavLabel>
             </Link>
-            <a className="nav-link" href="https://blog.prasannavijayan.in" title="Blog">
+            <a className={navLinkClass()} href="https://blog.prasannavijayan.in" title="Blog">
               <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                 <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20" />
                 <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z" />
               </svg>
-              <span>Blog</span>
+              <NavLabel>Blog</NavLabel>
             </a>
           </>
         }

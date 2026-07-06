@@ -57,7 +57,12 @@ const sunSVG = (
 export function ThemeToggle() {
   const { isDark, toggle } = useTheme();
   return (
-    <button className="theme-btn" title="Toggle theme" onClick={toggle} aria-label="Toggle theme">
+    <button
+      className="flex h-10 w-10 items-center justify-center rounded-full border-none bg-transparent text-text-secondary transition-colors duration-150 hover:bg-surface-hover"
+      title="Toggle theme"
+      onClick={toggle}
+      aria-label="Toggle theme"
+    >
       {isDark ? sunSVG : moonSVG}
     </button>
   );

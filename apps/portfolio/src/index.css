@@ -1,5 +1,15 @@
+@import "tailwindcss";
+@import "@pv/tokens/tailwind-theme.css";
+@source "../../../packages/ui/src";
+
 /* ─── RESET ──────────────────────────────────────────────────────────────── */
-* { box-sizing: border-box; margin: 0; padding: 0; }
+/* @layer base puts this reset in the same cascade layer Tailwind uses for its
+ * own Preflight reset — otherwise, per the CSS Cascade Layers spec, this
+ * *unlayered* rule would beat every Tailwind utility class regardless of
+ * specificity (that's what broke Nav/Footer's padding and gap earlier). */
+@layer base {
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+}
 
 body {
   font-family: 'Roboto', 'Google Sans Text', sans-serif;

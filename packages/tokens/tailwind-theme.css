@@ -1,0 +1,44 @@
+/* ─────────────────────────────────────────────────────────────────────────────
+ * @pv/tokens — Tailwind v4 theme mapping.
+ * Maps tokens.css's runtime CSS variables (which flip via [data-theme="dark"])
+ * onto Tailwind's @theme namespace, so utilities like `bg-surface` or
+ * `text-text-secondary` stay theme-aware instead of freezing a static value.
+ * Import this *after* tailwindcss and tokens.css in each app's entry CSS:
+ *   @import "tailwindcss";
+ *   @import "@pv/tokens/tokens.css";
+ *   @import "@pv/tokens/tailwind-theme.css";
+ * ───────────────────────────────────────────────────────────────────────────── */
+@theme {
+  --color-bg: var(--bg);
+  --color-bg-secondary: var(--bg-secondary);
+  --color-bg-tertiary: var(--bg-tertiary);
+  --color-surface: var(--surface);
+  --color-surface-hover: var(--surface-hover);
+  --color-border: var(--border);
+  --color-border-light: var(--border-light);
+  --color-text-primary: var(--text-primary);
+  --color-text-secondary: var(--text-secondary);
+  --color-text-tertiary: var(--text-tertiary);
+  --color-accent: var(--accent);
+  --color-accent-hover: var(--accent-hover);
+  --color-accent-light: var(--accent-light);
+  --color-accent-text: var(--accent-text);
+  --color-user-bubble: var(--user-bubble);
+  --color-user-bubble-text: var(--user-bubble-text);
+  --color-ai-bubble: var(--ai-bubble);
+
+  --shadow-sm: var(--shadow-sm);
+  --shadow-md: var(--shadow-md);
+  --shadow-lg: var(--shadow-lg);
+
+  --radius-pill: var(--radius);
+  --radius-card: var(--radius-sm);
+
+  --font-google-sans: "Google Sans", sans-serif;
+  --font-google-sans-text: "Google Sans Text", sans-serif;
+}
+
+/* Matches elements under [data-theme="light"] — for the rare style that needs
+ * to react to the theme attribute directly rather than through a token value. */
+@custom-variant theme-light (&:where([data-theme="light"], [data-theme="light"] *));
+

@@ -1,5 +1,5 @@
 ---
-import "@pv/tokens/tokens.css";
+import "@/global.css";
 import "@pv/ui/ui.css";
 import { Footer } from "@pv/ui";
 import Header from "@/components/Header";
@@ -50,14 +50,19 @@ const { title, description, postSlug, postStatus } = Astro.props;
     <Footer client:load variant="blog" rssUrl="/rss.xml" />
 
     <style>
-      :global(*) { box-sizing: border-box; margin: 0; padding: 0; }
-      :global(body) {
-        font-family: "Roboto", "Google Sans Text", sans-serif;
-        background: var(--bg);
-        color: var(--text-primary);
-        min-height: 100vh;
-        display: flex;
-        flex-direction: column;
+      /* @layer base keeps this in the same cascade layer as Tailwind's own
+       * Preflight reset — an unlayered rule here would otherwise beat every
+       * Tailwind utility class in Header/Footer regardless of specificity. */
+      @layer base {
+        :global(*) { box-sizing: border-box; margin: 0; padding: 0; }
+        :global(body) {
+          font-family: "Roboto", "Google Sans Text", sans-serif;
+          background: var(--bg);
+          color: var(--text-primary);
+          min-height: 100vh;
+          display: flex;
+          flex-direction: column;
+        }
       }
     </style>
   </body>

@@ -72,27 +72,32 @@ const githubSVG = (
 function FooterIllustration({ variant }: { variant: "portfolio" | "blog" }) {
   const glyph =
     variant === "blog" ? (
-      <g stroke="var(--surface, #fff)" strokeWidth="3" strokeLinecap="round">
+      <g className="stroke-surface" strokeWidth="3" strokeLinecap="round">
         <line x1="72" y1="82" x2="128" y2="82" />
         <line x1="72" y1="100" x2="128" y2="100" />
         <line x1="72" y1="118" x2="108" y2="118" />
       </g>
     ) : (
-      <g stroke="var(--surface, #fff)" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
+      <g className="stroke-surface" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
         <polyline points="86,84 70,100 86,116" fill="none" />
         <polyline points="114,84 130,100 114,116" fill="none" />
       </g>
     );
 
   return (
-    <svg className="footer-illustration" viewBox="0 0 200 200" aria-hidden="true" focusable="false">
+    <svg
+      className="pointer-events-none absolute -bottom-[120px] -right-5 z-0 h-[440px] w-[440px] opacity-[0.08]"
+      viewBox="0 0 200 200"
+      aria-hidden="true"
+      focusable="false"
+    >
       <defs>
         <linearGradient id={`footer-tile-${variant}`} x1="0" y1="0" x2="1" y2="1">
           <stop offset="0%" stopColor="var(--accent)" />
           <stop offset="100%" stopColor="var(--accent-light)" />
         </linearGradient>
       </defs>
-      <rect x="30" y="30" width="140" height="140" rx="28" fill="none" stroke="var(--border)" strokeWidth="2" />
+      <rect x="30" y="30" width="140" height="140" rx="28" className="stroke-border" fill="none" strokeWidth="2" />
       <rect x="46" y="46" width="140" height="140" rx="28" fill={`url(#footer-tile-${variant})`} />
       <g transform="translate(16 16)">{glyph}</g>
     </svg>
@@ -101,7 +106,7 @@ function FooterIllustration({ variant }: { variant: "portfolio" | "blog" }) {
 
 export function Footer({
   name = "Prasanna Vijayan",
-  roleChip = "AI Frontend Engineer · 10+ yrs",
+  roleChip = "Frontend Engineer evolving into <br/> AI-Native Full-Stack Engineer · 10+ yrs",
   email = "prasannavijayan.tm@gmail.com",
   linkedinUrl = "https://linkedin.com/in/prasannavijayan",
   githubUrl = "https://github.com/prasannavijayan",
@@ -113,54 +118,64 @@ export function Footer({
 }: FooterProps) {
   const [resumeOpen, setResumeOpen] = useState(false);
 
+  const linkClass = "flex items-center gap-1.5 text-accent-text no-underline hover:underline";
+
   return (
     <>
-      <footer className="site-footer">
-        <FooterMandala variant="rings" className="footer-mandala-a" />
-        <FooterMandala variant="bloom" className="footer-mandala-b" />
-        <FooterMandala variant="star" className="footer-mandala-c" />
+      <footer className="relative z-0 grid min-h-[260px] grid-cols-[1fr_auto_1fr] items-center gap-4 overflow-hidden border-t border-border px-12 py-10 font-google-sans-text text-sm text-text-tertiary max-[700px]:grid-cols-1 max-[700px]:justify-items-center max-[700px]:gap-7 max-[700px]:text-center">
+        <FooterMandala variant="rings" className="-left-[60px] -top-[60px] h-[200px] w-[200px]" />
+        <FooterMandala variant="bloom" className="-top-[90px] right-[15%] h-[140px] w-[140px] max-[700px]:hidden" />
+        <FooterMandala variant="star" className="-bottom-[110px] left-[42%] h-[170px] w-[170px] max-[700px]:hidden" />
         <FooterIllustration variant={variant} />
 
-        <div className="footer-left">
-          <div className="footer-identity">
-            <span className="footer-name">{name}</span>
-            <span className="footer-chip">{roleChip}</span>
+        <div className="relative z-10 flex flex-col justify-self-start gap-2.5 leading-[1.3] max-[700px]:items-center max-[700px]:justify-self-center">
+          <div className="flex flex-col leading-[1.3]">
+            <span className="text-[15px] font-medium text-text-primary">{name}</span>
+            <span className="text-[13px] text-text-tertiary" dangerouslySetInnerHTML={{ __html: roleChip }} />
           </div>
-          <div className="footer-copyright">
+          <div className="flex items-center gap-[5px]">
+            Copyright
             {copyrightSVG}
             {year}
           </div>
-          <span className="footer-tag">{tagline}</span>
+          <span className="italic text-text-tertiary">{tagline}</span>
         </div>
 
-        <nav className="footer-center">
-          <a href={linkedinUrl} target="_blank" rel="noopener noreferrer" title="LinkedIn">
+        <nav className="relative z-10 flex flex-col items-start justify-self-center gap-4 max-[700px]:items-center max-[700px]:justify-self-center">
+          <a className={linkClass} href={linkedinUrl} target="_blank" rel="noopener noreferrer" title="LinkedIn">
             {linkedinSVG}
             <span>LinkedIn</span>
           </a>
-          <a href={githubUrl} target="_blank" rel="noopener noreferrer" title="GitHub">
+          <a className={linkClass} href={githubUrl} target="_blank" rel="noopener noreferrer" title="GitHub">
             {githubSVG}
             <span>GitHub</span>
           </a>
-          <button type="button" className="footer-resume-btn" onClick={() => setResumeOpen(true)}>
+          <button
+            type="button"
+            className="flex items-center gap-1.5 border-none bg-transparent p-0 m-0 [font:inherit] text-accent-text cursor-pointer hover:underline"
+            onClick={() => setResumeOpen(true)}
+          >
             {downloadSVG}
             <span>Resume</span>
           </button>
         </nav>
 
-        <div className="footer-right">
-          <a className="footer-contact-btn" href={`mailto:${email}`}>
+        <div className="relative z-10 flex flex-col items-center justify-self-end gap-2.5">
+          <a
+            className="flex items-center gap-1.5 rounded-full border border-border bg-transparent px-4 py-2 font-medium text-accent-text no-underline transition-all duration-150 hover:border-accent hover:bg-accent-light hover:no-underline"
+            href={`mailto:${email}`}
+          >
             {mailSVG}
             <span>Contact us</span>
           </a>
           {rssUrl && (
-            <a className="footer-secondary-link" href={rssUrl} title="RSS feed" aria-label="RSS feed">
+            <a className={linkClass} href={rssUrl} title="RSS feed" aria-label="RSS feed">
               {rssSVG}
               <span>RSS feed</span>
             </a>
           )}
           {blogUrl && (
-            <a className="footer-secondary-link" href={blogUrl}>
+            <a className={linkClass} href={blogUrl}>
               {blogSVG}
               <span>Blog</span>
             </a>

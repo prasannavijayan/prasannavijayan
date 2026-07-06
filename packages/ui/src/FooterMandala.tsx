@@ -5,7 +5,7 @@ type MandalaVariant = "bloom" | "rings" | "star";
 function Bloom() {
   const petals = Array.from({ length: 16 }, (_, i) => i * 22.5);
   return (
-    <g fill="none" stroke="var(--accent)" strokeWidth="1">
+    <g className="stroke-accent" fill="none" strokeWidth="1">
       <circle cx="100" cy="100" r="96" />
       <circle cx="100" cy="100" r="64" />
       <circle cx="100" cy="100" r="32" />
@@ -19,7 +19,7 @@ function Bloom() {
 function Rings() {
   const spokes = Array.from({ length: 12 }, (_, i) => i * 30);
   return (
-    <g fill="none" stroke="var(--accent)" strokeWidth="1">
+    <g className="stroke-accent" fill="none" strokeWidth="1">
       <circle cx="100" cy="100" r="92" />
       <circle cx="100" cy="100" r="72" />
       <circle cx="100" cy="100" r="52" />
@@ -34,7 +34,7 @@ function Rings() {
 function Star() {
   const points = Array.from({ length: 10 }, (_, i) => i * 36);
   return (
-    <g fill="none" stroke="var(--accent)" strokeWidth="1">
+    <g className="stroke-accent" fill="none" strokeWidth="1">
       <circle cx="100" cy="100" r="88" />
       <circle cx="100" cy="100" r="40" />
       {points.map((deg) => (
@@ -61,7 +61,12 @@ export function FooterMandala({
 }) {
   const Pattern = variants[variant];
   return (
-    <svg className={`footer-mandala ${className}`.trim()} viewBox="0 0 200 200" aria-hidden="true" focusable="false">
+    <svg
+      className={`pointer-events-none absolute z-0 opacity-[0.16] theme-light:opacity-30 ${className}`.trim()}
+      viewBox="0 0 200 200"
+      aria-hidden="true"
+      focusable="false"
+    >
       <Pattern />
     </svg>
   );

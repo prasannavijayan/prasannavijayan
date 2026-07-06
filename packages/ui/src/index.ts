@@ -1,4 +1,4 @@
-export { Nav } from "./Nav";
+export { Nav, navLinkClass, NavLabel } from "./Nav";
 export { Footer } from "./Footer";
 export { FooterMandala } from "./FooterMandala";
 export { ResumeModal } from "./ResumeModal";
