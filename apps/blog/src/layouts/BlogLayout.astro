@@ -2,6 +2,7 @@
 import "@pv/tokens/tokens.css";
 import "@pv/ui/ui.css";
 import { Footer } from "@pv/ui";
+import Header from "@/components/Header";
 // `?url` → resolve to a URL string. Astro 5 otherwise imports SVGs as components.
 import faviconLight from "@pv/logos/pvy-blog-light.svg?url";
 import faviconDark from "@pv/logos/pvy-blog-dark.svg?url";
@@ -26,21 +27,24 @@ const brandLogo = faviconLight;
     {description && <meta name="description" content={description} />}
     <link rel="icon" type="image/svg+xml" href={faviconLight} media="(prefers-color-scheme: light)" />
     <link rel="icon" type="image/svg+xml" href={faviconDark} media="(prefers-color-scheme: dark)" />
+    <link rel="alternate" type="application/rss+xml" title="Prasanna Vijayan — Blog" href="/rss.xml" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
       href="https://fonts.googleapis.com/css2?family=Google+Sans:wght@400;500;600&family=Google+Sans+Text:wght@400;500&family=Roboto:wght@300;400;500&display=swap"
       rel="stylesheet"
     />
+    <script is:inline>
+      // Set the theme before paint to avoid a light/dark flash.
+      (function () {
+        var stored = localStorage.getItem("theme");
+        var isDark = stored ? stored === "dark" : matchMedia("(prefers-color-scheme: dark)").matches;
+        document.documentElement.setAttribute("data-theme", isDark ? "dark" : "light");
+      })();
+    </script>
   </head>
   <body data-post-slug={postSlug} data-post-status={postStatus}>
-    <header class="topnav">
-      <a class="brand" href="https://prasannavijayan.in">
-        <img class="brand-logo" src={brandLogo} alt="Pvy" />
-        <span class="brand-text">Prasanna <span>Vijayan</span></span>
-      </a>
-      <a class="chip" href="/">Blog</a>
-    </header>
+    <Header client:load />
 
     <slot />
 
@@ -55,41 +59,6 @@ const brandLogo = faviconLight;
         min-height: 100vh;
         display: flex;
         flex-direction: column;
-      }
-      .topnav {
-        display: flex;
-        align-items: center;
-        gap: 12px;
-        height: 64px;
-        padding: 0 20px;
-        border-bottom: 1px solid var(--border);
-      }
-      .brand {
-        display: flex;
-        align-items: center;
-        gap: 10px;
-        text-decoration: none;
-      }
-      .brand-logo {
-        width: 28px;
-        height: 28px;
-        border-radius: 50%;
-        display: block;
-      }
-      .brand-text {
-        font-family: "Google Sans", sans-serif;
-        font-size: 18px;
-        font-weight: 500;
-        color: var(--text-primary);
-      }
-      .brand-text span { color: var(--accent); }
-      .chip {
-        font-size: 11px;
-        color: var(--text-secondary);
-        background: var(--bg-tertiary);
-        padding: 4px 10px;
-        border-radius: 20px;
-        text-decoration: none;
       }
     </style>
   </body>

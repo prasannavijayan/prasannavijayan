@@ -1,5 +1,8 @@
+import { useState } from "react";
 import { Link } from "react-router-dom";
-import { Nav, ThemeToggle } from "@pv/ui";
+import { Footer, Nav, ThemeToggle } from "@pv/ui";
+import { ResumeModal } from "@/components/ResumeModal";
+import { RoleChip } from "@/components/RoleChip";
 import { useLogo } from "@/lib/useLogo";
 
 type Project = {
@@ -48,16 +51,21 @@ const projects: Project[] = [
     ),
     description:
       "A personal expense tracker powered by WhatsApp. Text an expense → it's auto-categorised → view monthly spending breakdowns on a responsive dashboard with pie/bar charts and an itemised table.",
-    tags: ["React 18", "Django REST", "Recharts", "Twilio WhatsApp", "SQLite"],
+    tags: ["React 18", "Django REST", "Recharts", "Twilio WhatsApp", "PostgreSQL", "Vercel", "Supabase"],
     cta: "View dashboard",
   },
 ];
 
 export default function Projects() {
   const logo = useLogo();
+  const [resumeOpen, setResumeOpen] = useState(false);
   return (
     <>
-      <Nav name="Prasanna Vijayan" avatarUrl={logo} chip="AI Frontend Engineer · 10+ yrs">
+      <Nav
+        name="Prasanna Vijayan"
+        avatarUrl={logo}
+        chip={<RoleChip onResumeClick={() => setResumeOpen(true)} />}
+      >
         <Link className="nav-link" to="/" title="Home">
           <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
             <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" />
@@ -65,6 +73,20 @@ export default function Projects() {
           </svg>
           <span>Home</span>
         </Link>
+        <Link className="nav-link active" to="/projects" title="Projects">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            <polyline points="16 18 22 12 16 6" />
+            <polyline points="8 6 2 12 8 18" />
+          </svg>
+          <span>Projects</span>
+        </Link>
+        <a className="nav-link" href="https://blog.prasannavijayan.in" title="Blog">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20" />
+            <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z" />
+          </svg>
+          <span>Blog</span>
+        </a>
         <ThemeToggle />
       </Nav>
 
@@ -108,6 +130,10 @@ export default function Projects() {
           </div>
         </div>
       </div>
+
+      <Footer logoSrc={logo} />
+
+      <ResumeModal open={resumeOpen} onClose={() => setResumeOpen(false)} />
     </>
   );
 }

@@ -315,27 +315,6 @@ body {
   .empty-title { font-size: 20px; }
 }
 
-/* ─── RESUME BUTTON (NAV) ────────────────────────────────────────────────────── */
-.resume-btn {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  padding: 7px 14px;
-  border-radius: 20px;
-  border: 1px solid var(--accent);
-  background: transparent;
-  color: var(--accent-text);
-  font-size: 13px;
-  font-family: 'Google Sans Text', sans-serif;
-  font-weight: 500;
-  cursor: pointer;
-  transition: all 0.15s;
-  white-space: nowrap;
-}
-.resume-btn:hover {
-  background: var(--accent-light);
-}
-
 /* ─── PDF MODAL ──────────────────────────────────────────────────────────────── */
 .pdf-overlay {
   position: fixed;
@@ -454,7 +433,6 @@ body {
 @media (max-width: 600px) {
   .pdf-overlay { padding: 0; }
   .pdf-modal { border-radius: 0; height: 100dvh; max-width: 100%; }
-  .resume-btn span { display: none; }
 }
 
 /* ─── PROJECTS PAGE ──────────────────────────────────────────────────────────── */

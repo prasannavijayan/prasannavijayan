@@ -59,12 +59,35 @@
 }
 
 .nav-chip {
+  display: flex;
+  align-items: center;
+  gap: 6px;
   font-size: 11px;
   color: var(--text-secondary);
   background: var(--bg-tertiary);
   padding: 4px 10px;
   border-radius: 20px;
   font-family: "Google Sans Text", sans-serif;
+  white-space: nowrap;
+}
+
+.nav-chip a {
+  color: inherit;
+  text-decoration: none;
+}
+
+.chip-resume-btn {
+  border: none;
+  background: none;
+  padding: 0;
+  margin: 0;
+  font: inherit;
+  font-weight: 600;
+  color: var(--accent-text);
+  cursor: pointer;
+}
+.chip-resume-btn:hover {
+  text-decoration: underline;
 }
 
 .theme-btn {
@@ -103,9 +126,35 @@
   color: var(--text-primary);
 }
 
+.nav-link.active {
+  color: var(--text-primary);
+  padding-bottom: 5px;
+  border-bottom: 2px solid var(--accent);
+}
+
 @media (max-width: 600px) {
-  .nav-chip {
+  /* Collapse the chip to just its action (e.g. Resume) so it stays reachable;
+     plain text-only chips (no .chip-role-text) still hide entirely. */
+  .nav-chip:not(:has(.chip-role-text)) {
     display: none;
+  }
+  .chip-role-text {
+    display: none;
+  }
+  .nav-chip {
+    padding: 4px 8px;
+  }
+}
+
+@media (max-width: 640px) {
+  .nav-link span {
+    display: none;
+  }
+  .nav-link {
+    padding: 7px 10px;
+  }
+  .nav-link.active {
+    padding-bottom: 5px;
   }
 }
 

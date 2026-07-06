@@ -1,28 +1,19 @@
 import type { ReactNode } from "react";
 
 type FooterProps = {
-  /** Name shown in the copyright line. */
+  /** Alt text for the logo. */
   name?: string;
-  /** Copyright year. Defaults to the current year. */
-  year?: number;
-  /** Optional brand logo shown before the copyright text. */
+  /** Optional brand logo. */
   logoSrc?: string;
-  /** Optional links rendered after the copyright (e.g. anchors). */
+  /** Optional links rendered after the logo (e.g. anchors). */
   children?: ReactNode;
 };
 
-export function Footer({
-  name = "Prasanna Vijayan",
-  year = new Date().getFullYear(),
-  logoSrc,
-  children,
-}: FooterProps) {
+// Copyright line dropped for now — logo + links only until we decide what goes here.
+export function Footer({ name = "Prasanna Vijayan", logoSrc, children }: FooterProps) {
   return (
     <footer className="site-footer">
       {logoSrc && <img className="site-footer-logo" src={logoSrc} alt={name} />}
-      <span className="site-footer-copy">
-        © {year} {name}
-      </span>
       {children && <nav className="site-footer-links">{children}</nav>}
     </footer>
   );
