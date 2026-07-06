@@ -14,12 +14,27 @@ function getInitialIsDark(): boolean {
 }
 
 export function ThemeProvider({ children }: { children: ReactNode }) {
-  const [isDark, setIsDark] = useState<boolean>(getInitialIsDark);
+  // Always start `false` so the very first client render matches what a
+  // server-rendered shell produced (Astro's client:load islands hydrate
+  // against SSR output, which has no window and always defaults to light) —
+  // reading localStorage/matchMedia synchronously here would return a
+  // different value than the server on repeat visits and trigger a React
+  // hydration-mismatch error. The real value is applied a tick later below.
+  const [isDark, setIsDark] = useState(false);
+  const [hydrated, setHydrated] = useState(false);
 
   useEffect(() => {
+    setIsDark(getInitialIsDark());
+    setHydrated(true);
+  }, []);
+
+  useEffect(() => {
+    // Skip the very first (pre-hydration-correction) pass so we never
+    // clobber a stored "dark" preference with the placeholder "light" value.
+    if (!hydrated) return;
     document.documentElement.setAttribute("data-theme", isDark ? "dark" : "light");
     window.localStorage.setItem("theme", isDark ? "dark" : "light");
-  }, [isDark]);
+  }, [isDark, hydrated]);
 
   return (
     <ThemeContext.Provider value={{ isDark, toggle: () => setIsDark((d) => !d) }}>
