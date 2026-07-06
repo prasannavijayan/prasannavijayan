@@ -2,3 +2,18 @@
 @import "@pv/tokens/tokens.css";
 @import "@pv/tokens/tailwind-theme.css";
 @source "../../../packages/ui/src";
+
+/* Swup page transition (swup({ theme: false }) in astro.config.mjs) — the
+ * leaving page sinks down + fades out, the entering page rises up + fades in.
+ * Same two rules drive both directions: swup's `is-animating` class is what's
+ * present on the outgoing content mid-leave, and is still present for one
+ * frame on the freshly-swapped-in content, so it starts "sunk" and animates
+ * up to rest once swup removes the class — no separate forward/back rules
+ * needed for "post rises up" vs "list sinks down, then rises to render". */
+html.is-changing .transition-slide {
+  transition: transform 0.45s cubic-bezier(0.22, 1, 0.36, 1), opacity 0.3s ease;
+}
+html.is-animating .transition-slide {
+  transform: translateY(32px);
+  opacity: 0;
+}
