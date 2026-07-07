@@ -15,6 +15,8 @@ const blog = defineCollection({
     title: z.string(),
     description: z.string(),
     tags: z.array(z.string()).default([]),
+    pinned: z.boolean().default(false),
+    quirks: z.array(z.string()).default([]),
     ...provenanceFields,
   }),
 });

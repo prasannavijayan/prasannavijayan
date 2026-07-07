@@ -1,0 +1,88 @@
+---
+// Renders a post's `quirks` frontmatter as a checklist, shuffled into a stable
+// build-time order (seeded by slug) so it doesn't read like a copy-pasted list.
+// No client-side shuffle: the blog uses Swup for page transitions, which swaps
+// <main> via innerHTML and won't re-execute a <script> tag on navigation.
+interface Props {
+  quirks: string[];
+  seed: string;
+}
+const { quirks, seed } = Astro.props;
+
+function seededShuffle<T>(items: T[], seedStr: string): T[] {
+  let h = 0;
+  for (let i = 0; i < seedStr.length; i++) {
+    h = (h * 31 + seedStr.charCodeAt(i)) >>> 0;
+  }
+  const rand = () => {
+    h = (h * 1664525 + 1013904223) >>> 0;
+    return h / 0xffffffff;
+  };
+  const shuffled = [...items];
+  for (let i = shuffled.length - 1; i > 0; i--) {
+    const j = Math.floor(rand() * (i + 1));
+    [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+  }
+  return shuffled;
+}
+
+const ordered = seededShuffle(quirks, seed);
+---
+
+<aside class="quirks">
+  <h2 class="quirks-title">What actually happened during review</h2>
+  <ul class="quirks-list">
+    {
+      ordered.map((quirk) => (
+        <li>
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="var(--accent)">
+            <circle cx="12" cy="12" r="12" />
+            <path
+              d="M7 12.5l3 3 7-7"
+              fill="none"
+              stroke="var(--bg)"
+              stroke-width="2.2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            />
+          </svg>
+          <span>{quirk}</span>
+        </li>
+      ))
+    }
+  </ul>
+</aside>
+
+<style>
+  .quirks {
+    margin-top: 40px;
+    padding: 20px 24px;
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    background: var(--bg-secondary);
+  }
+  .quirks-title {
+    font-family: "Google Sans", sans-serif;
+    font-size: 15px;
+    font-weight: 500;
+    margin-bottom: 14px;
+  }
+  .quirks-list {
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+  .quirks-list li {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    font-size: 14px;
+    line-height: 1.5;
+    color: var(--text-secondary);
+  }
+  .quirks-list svg {
+    flex-shrink: 0;
+    margin-top: 3px;
+  }
+</style>
