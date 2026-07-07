@@ -72,7 +72,7 @@ export default function Chat() {
   const isEmpty = messages.length === 0;
 
   return (
-    <>
+    <div className="chat-shell">
       <Nav
         name="Prasanna Vijayan"
         avatarUrl={logo}
@@ -207,6 +207,6 @@ export default function Chat() {
       </div>
 
       <ResumeModal open={resumeOpen} onClose={() => setResumeOpen(false)} />
-    </>
+    </div>
   );
 }

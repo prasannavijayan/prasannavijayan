@@ -160,7 +160,7 @@ export function Footer({
           </button>
         </nav>
 
-        <div className="relative z-10 flex flex-col items-center justify-self-end gap-2.5">
+        <div className="relative z-10 flex flex-col items-center justify-self-end gap-2.5 max-[700px]:justify-self-center">
           <a
             className="flex items-center gap-1.5 rounded-full border border-border bg-transparent px-4 py-2 font-medium text-accent-text no-underline transition-all duration-150 hover:border-accent hover:bg-accent-light hover:no-underline"
             href={`mailto:${email}`}

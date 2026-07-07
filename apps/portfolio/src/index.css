@@ -15,17 +15,25 @@ body {
   font-family: 'Roboto', 'Google Sans Text', sans-serif;
   background: var(--bg);
   color: var(--text-primary);
-  height: 100vh;
-  display: flex;
-  flex-direction: column;
+  min-height: 100vh;
   transition: background 0.2s, color 0.2s;
-  overflow: hidden;
 }
 
 #root {
   display: flex;
   flex-direction: column;
+  min-height: 100vh;
+}
+
+/* ─── CHAT SHELL ─────────────────────────────────────────────────────────── */
+/* Chat is the only page pinned to exactly one viewport tall, with its own
+ * internal scroll region (.messages) — everything else (e.g. Projects) grows
+ * with its content and scrolls the whole page instead. */
+.chat-shell {
   height: 100vh;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
 }
 
 /* ─── MAIN LAYOUT ────────────────────────────────────────────────────────── */
@@ -349,7 +357,6 @@ body {
 /* ─── PROJECTS PAGE ──────────────────────────────────────────────────────────── */
 .page {
   flex: 1;
-  overflow-y: auto;
   width: 100%;
 }
 
