@@ -16,7 +16,7 @@ const timing = reviewTook
 ---
 
 <span class="provenance">
-  <span class="provenance-badge">{attribution}</span>
+  {attribution && <span class="provenance-badge">{attribution}</span>}
   {reviewTook && (
     <svg
       class="verified-tick"

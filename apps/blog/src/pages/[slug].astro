@@ -18,13 +18,10 @@ const words = (post.body ?? "").split(/\s+/).filter(Boolean).length;
 const minutes = Math.max(1, Math.round(words / 200));
 ---
 
-<BlogLayout
-  title={`${post.data.title} — Prasanna Vijayan`}
-  description={post.data.description}
-  postSlug={post.id}
-  postStatus={post.data.status}
->
-  <main class="transition-slide">
+<BlogLayout title={`${post.data.title} — Prasanna Vijayan`} description={post.data.description}>
+  <!-- data-post-* live here (not on <body>) because swup only swaps <main> on
+       client-side nav — attributes on <body> would go stale until a hard reload. -->
+  <main class="transition-slide" data-post-slug={post.id} data-post-status={post.data.status}>
     <a class="back" href="/">← All posts</a>
 
     <article>

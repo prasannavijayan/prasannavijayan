@@ -13,8 +13,11 @@ export default defineToolbarApp({
     let timer: number | undefined;
 
     function currentPost(): { slug: string; status: string } | null {
-      const slug = document.body.dataset.postSlug;
-      const status = document.body.dataset.postStatus ?? "";
+      // Read from <main>, not <body> — swup only swaps <main> on client-side
+      // nav, so attributes on <body> would go stale until a hard reload.
+      const main = document.querySelector("main");
+      const slug = main?.dataset.postSlug;
+      const status = main?.dataset.postStatus ?? "";
       return slug ? { slug, status } : null;
     }
 
@@ -121,6 +124,19 @@ export default defineToolbarApp({
     (_app as unknown as { onToggled?: (cb: (e: { state: boolean }) => void) => void }).onToggled?.(({ state }) => {
       if (state) render();
       else stopTimer();
+    });
+    // swup dispatches DOM CustomEvents prefixed "swup:" for each of its hooks —
+    // "page:view" fires once content has been swapped in, after which <main>
+    // (and its data-post-* attributes) reflect the new page. @swup/astro also
+    // fires Astro's native "astro:after-swap" for compat, which the dev
+    // toolbar's own DevToolbarCanvas listens for to reconnect itself — and its
+    // connectedCallback unconditionally resets shadowRoot.innerHTML, wiping
+    // `root` out of the canvas (canvas.init only ever runs once, so nothing
+    // else re-appends it). Re-append before re-rendering or updates are
+    // invisible even though render() itself "succeeds".
+    document.addEventListener("swup:page:view", () => {
+      if (!canvas.contains(root)) canvas.appendChild(root);
+      render();
     });
   },
 });

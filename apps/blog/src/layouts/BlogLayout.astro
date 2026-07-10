@@ -10,11 +10,8 @@ import faviconDark from "@pv/logos/pvy-blog-dark.svg?url";
 interface Props {
   title: string;
   description?: string;
-  // When rendering a single post, expose it to the dev Review Timer toolbar app.
-  postSlug?: string;
-  postStatus?: string;
 }
-const { title, description, postSlug, postStatus } = Astro.props;
+const { title, description } = Astro.props;
 const gaId = import.meta.env.PUBLIC_GA_MEASUREMENT_ID;
 ---
 
@@ -78,7 +75,7 @@ const gaId = import.meta.env.PUBLIC_GA_MEASUREMENT_ID;
       )
     }
   </head>
-  <body data-post-slug={postSlug} data-post-status={postStatus}>
+  <body>
     <Header client:load />
 
     <slot />
