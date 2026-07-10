@@ -80,6 +80,7 @@ Now hide the clock and the console goes quiet. Show and hide it twenty times and
 
 > **Anything you start in an effect, stop in its cleanup.**
 
+<h3> ### <a href="https://stackblitz.com/edit/vitejs-vite-hgzngjel?file=src%2FApp.tsx" rel="noopener" target="_blank">Live Demo</a> ### </h3><br/>
 Started a timer? Clear it. Added a listener? Remove it. Opened a subscription? Close it.
 
 ## 📋 The usual suspects
