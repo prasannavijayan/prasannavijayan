@@ -41,29 +41,9 @@ const timing = reviewTook
   {timing && <span class="provenance-took">{timing}</span>}
 </span>
 
-<style>
-  .provenance {
-    display: inline-flex;
-    align-items: center;
-    gap: 8px;
-    flex-wrap: wrap;
-  }
-  .provenance-badge {
-    font-size: 11px;
-    font-weight: 500;
-    color: var(--accent-text);
-    background: var(--accent-light);
-    border: 1px solid var(--border);
-    padding: 3px 10px;
-    border-radius: 20px;
-    font-family: "Google Sans Text", sans-serif;
-  }
-  .verified-tick {
-    flex-shrink: 0;
-  }
-  .provenance-took {
-    font-size: 11px;
-    color: var(--text-tertiary);
-    font-family: "Google Sans Text", sans-serif;
-  }
-</style>
+<!-- .provenance* rules live in global.css, not a scoped <style> here — this
+     badge is also reimplemented in plain JSX as ProvenanceBadge in
+     BlogPostList.tsx (the index page's React search island). Astro only
+     bundles a component's CSS into pages that actually import that
+     component, and index.astro no longer imports this one; global.css is
+     loaded on every page via BlogLayout, so both usages pick up the rules. -->
