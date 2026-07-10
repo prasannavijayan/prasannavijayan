@@ -8,7 +8,7 @@ publishedAt: "2026-07-10T20:56:19"
 timeToPublish: "5 days"
 attribution: "AI Written, Human reviewed"
 reviewStartedAt: "2026-07-10T20:55:18"
-reviewCompletedAt: "2026-07-10T20:56:19"
+reviewCompletedAt: "2026-07-10T21:02:19"
 reviewTook: "7 minutes"
 ---
 
