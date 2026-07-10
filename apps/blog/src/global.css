@@ -17,3 +17,31 @@ html.is-animating .transition-slide {
   transform: translateY(32px);
   opacity: 0;
 }
+
+/* Provenance badge (attribution + review-timing) — shared by Provenance.astro
+ * (single-post page) and ProvenanceBadge in BlogPostList.tsx (index page's
+ * React search island), so it lives here rather than scoped to either file. */
+.provenance {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+.provenance-badge {
+  font-size: 11px;
+  font-weight: 500;
+  color: var(--accent-text);
+  background: var(--accent-light);
+  border: 1px solid var(--border);
+  padding: 3px 10px;
+  border-radius: 20px;
+  font-family: "Google Sans Text", sans-serif;
+}
+.verified-tick {
+  flex-shrink: 0;
+}
+.provenance-took {
+  font-size: 11px;
+  color: var(--text-tertiary);
+  font-family: "Google Sans Text", sans-serif;
+}

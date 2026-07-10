@@ -1,7 +1,7 @@
 ---
 import { getCollection } from "astro:content";
 import BlogLayout from "@/layouts/BlogLayout.astro";
-import Provenance from "@/components/Provenance.astro";
+import BlogPostList, { type PostSummary } from "@/components/BlogPostList";
 import { formatDate, isVisible } from "@/lib/provenance";
 
 // In dev: all posts (draft reading mode). In production: only published. Newest first.
@@ -11,79 +11,40 @@ const allPosts = (await getCollection("blog", (p) => isVisible(p.data.status))).
     new Date(a.data.publishedAt || a.data.created).getTime(),
 );
 
-const pinned = allPosts.find((p) => p.data.pinned);
-const posts = allPosts.filter((p) => !p.data.pinned);
-
 function readingTime(body: string): number {
   const words = body.split(/\s+/).filter(Boolean).length;
   return Math.max(1, Math.round(words / 200));
 }
+
+const posts: PostSummary[] = allPosts.map((p) => ({
+  id: p.id,
+  title: p.data.title,
+  description: p.data.description,
+  status: p.data.status,
+  dateLabel: formatDate(p.data.publishedAt || p.data.created),
+  readingTime: readingTime(p.body ?? ""),
+  pinned: p.data.pinned,
+  attribution: p.data.attribution,
+  reviewTook: p.data.reviewTook,
+  timeToPublish: p.data.timeToPublish,
+}));
 ---
 
 <BlogLayout title="Prasanna Vijayan — Blog" description="Notes on JavaScript, frontend, and building for the web.">
   <main class="transition-slide index-layout">
-    {pinned && <div class="rail-spacer" aria-hidden="true" />}
-
-    <div class="post-column">
-      <h1>Writing</h1>
-      {
-        posts.length === 0 ? (
-          <p class="empty">No posts yet — coming soon.</p>
-        ) : (
-          <ul class="post-list">
-            {posts.map((p) => (
-              <li>
-                <a href={`/${p.id}`}>
-                  <span class="post-title">
-                    {p.data.status !== "published" && <span class="draft-flag">Draft</span>}
-                    {p.data.title}
-                  </span>
-                  <span class="post-meta">
-                    {formatDate(p.data.publishedAt || p.data.created)} · {readingTime(p.body ?? "")} min read
-                  </span>
-                  <span class="post-excerpt">{p.data.description}</span>
-                  <span class="post-footer-row">
-                    <Provenance attribution={p.data.attribution} reviewTook={p.data.reviewTook} timeToPublish={p.data.timeToPublish} />
-                  </span>
-                </a>
-              </li>
-            ))}
-          </ul>
-        )
-      }
-    </div>
-
-    {
-      pinned && (
-        <aside class="pinned-rail">
-          <svg class="pinned-pin" width="200" height="200" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-            <path d="M12 22s7-7.6 7-12A7 7 0 0 0 5 10c0 4.4 7 12 7 12z" />
-            <circle cx="12" cy="10" r="2.5" />
-          </svg>
-          <span class="pinned-label">Pinned</span>
-          <a href={`/${pinned.id}`}>
-            <span class="pinned-title">{pinned.data.title}</span>
-            <span class="pinned-excerpt">{pinned.data.description}</span>
-            <span class="pinned-footer">
-              <Provenance
-                attribution={pinned.data.attribution}
-                reviewTook={pinned.data.reviewTook}
-                timeToPublish={pinned.data.timeToPublish}
-              />
-            </span>
-          </a>
-        </aside>
-      )
-    }
+    <BlogPostList client:load posts={posts} />
   </main>
 
-  <style>
-    /* post-column (720) sits between a spacer and the aside (both 280 + 32 gap) so it
-       stays centered on the page — matching how the article is centered on the
-       single-post page — instead of the aside pulling it off-center.
-       The aside and spacer live inside <main> (not as siblings) because swup's
+  <style is:global>
+    /* post-column (720) sits between the search panel and the aside (both 280 +
+       32 gap) so it stays centered on the page — matching how the article is
+       centered on the single-post page — instead of the aside pulling it
+       off-center. Both live inside <main> (not as siblings) because swup's
        default `containers: ['main']` only swaps <main> between page loads —
-       anything outside it survives navigation. */
+       anything outside it survives navigation. This whole listing is rendered
+       by the <BlogPostList> React island (is:global above lets these rules,
+       written once in this .astro file, still reach elements it renders —
+       Astro's CSS scoping only reaches the file's own template). */
     .index-layout {
       display: flex;
       flex: 1;
@@ -92,8 +53,101 @@ function readingTime(body: string): number {
       max-width: 1344px;
       margin: 0 auto;
     }
-    .rail-spacer {
+    /* margin-top matches .pinned-rail below so the search box lines up with
+       where the blog list itself starts, not the top of the page. */
+    .search-panel {
       flex: 0 0 280px;
+      position: sticky;
+      top: 24px;
+      align-self: flex-start;
+      margin-top: 116px;
+    }
+    .search-input {
+      width: 100%;
+      font: inherit;
+      font-size: 14px;
+      color: var(--text-primary);
+      background: var(--bg-secondary);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      padding: 10px 14px;
+    }
+    .search-input:focus {
+      outline: none;
+      border-color: var(--accent);
+      box-shadow: var(--shadow-md);
+    }
+    /* Desktop-only dropdown (hidden on mobile below) — a simple list of
+       titles under the search box; Pinned/Writing stay untouched behind it.
+       Clicking a title is a plain navigation to the post, full screen. */
+    .search-dropdown {
+      margin-top: 10px;
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      background: var(--bg-secondary);
+      overflow: hidden;
+    }
+    .search-dropdown-status {
+      padding: 10px 12px;
+      font-size: 12px;
+      color: var(--text-tertiary);
+      line-height: 1.5;
+    }
+    .search-dropdown-status code {
+      font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+      background: var(--bg-tertiary);
+      padding: 1px 5px;
+      border-radius: 4px;
+    }
+    .search-dropdown-list { list-style: none; }
+    .search-dropdown-list li + li { border-top: 1px solid var(--border); }
+    .search-dropdown-list a {
+      display: block;
+      padding: 10px 12px;
+      font-size: 13px;
+      color: inherit;
+      text-decoration: none;
+    }
+    .search-dropdown-list a:hover { background: var(--bg-tertiary); }
+    .no-results {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+      color: var(--text-tertiary);
+      padding: 40px 20px;
+    }
+    .no-results-icon {
+      width: 40px;
+      height: 40px;
+      margin-bottom: 14px;
+      color: var(--text-tertiary);
+      opacity: 0.6;
+    }
+    .no-results-text {
+      font-family: "Google Sans", sans-serif;
+      font-size: 15px;
+      font-weight: 500;
+      color: var(--text-secondary);
+    }
+    .no-results-subtext {
+      font-size: 13px;
+      margin-top: 4px;
+    }
+    /* Compact variant for the narrow desktop dropdown — smaller icon, no
+       subtext, tighter padding. */
+    .no-results-compact {
+      padding: 20px 12px;
+    }
+    .no-results-compact .no-results-icon {
+      width: 26px;
+      height: 26px;
+      margin-bottom: 8px;
+    }
+    .no-results-compact .no-results-text {
+      font-size: 12px;
+      font-weight: 400;
+      color: var(--text-tertiary);
     }
     .post-column {
       flex: 1 1 auto;
@@ -101,6 +155,9 @@ function readingTime(body: string): number {
       max-width: 720px;
       padding: 48px 20px;
     }
+    /* Mobile-only full takeover of .post-column (hidden on desktop below —
+       desktop keeps Writing showing and uses the dropdown above instead). */
+    .mobile-search-results { display: none; }
     .pinned-rail {
       position: sticky;
       flex: 0 0 280px;
@@ -158,7 +215,28 @@ function readingTime(body: string): number {
         flex-direction: column;
         gap: 0;
       }
-      .rail-spacer {
+      .search-panel {
+        position: relative;
+        top: auto;
+        flex: 0 0 auto;
+        align-self: stretch;
+        order: -2;
+        margin: 32px 20px 0;
+      }
+      /* Mobile search is a full takeover, not the desktop dropdown: hide it
+         here, and — while actively searching — hide Writing and Pinned so
+         only the matched posts show (data-searching is set on .post-column
+         by BlogPostList; ~ reaches .pinned-rail since it's a later sibling). */
+      .search-dropdown {
+        display: none;
+      }
+      .post-column[data-searching] .mobile-search-results {
+        display: block;
+      }
+      .post-column[data-searching] .default-listing {
+        display: none;
+      }
+      .post-column[data-searching] ~ .pinned-rail {
         display: none;
       }
       .pinned-rail {

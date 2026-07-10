@@ -24,7 +24,11 @@ const minutes = Math.max(1, Math.round(words / 200));
   <main class="transition-slide" data-post-slug={post.id} data-post-status={post.data.status}>
     <a class="back" href="/">← All posts</a>
 
-    <article>
+    <!-- data-pagefind-body scopes indexing to real post content (excluding
+         Header/Footer/nav repeated on every page); once used anywhere on the
+         site, Pagefind only indexes tagged regions, so the index page (no
+         tag) is correctly never indexed as a result either. -->
+    <article data-pagefind-body>
       {post.data.status !== "published" && <span class="draft-flag">Draft preview</span>}
       <h1>{post.data.title}</h1>
 
