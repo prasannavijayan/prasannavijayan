@@ -109,14 +109,51 @@ const minutes = Math.max(1, Math.round(words / 200));
   <style is:global>
     .prose { font-size: 16px; line-height: 1.75; color: var(--text-primary); }
     .prose p { margin: 0 0 18px; }
+    /* Give in-page anchor targets (e.g. the REPL footnote's #readme) some
+       breathing room from the top edge when jumped to, and smooth the jump. */
+    html { scroll-behavior: smooth; }
+    .prose [id] { scroll-margin-top: 24px; }
     .prose h2 {
       font-family: "Google Sans", sans-serif;
       font-size: 22px;
       font-weight: 500;
       margin: 36px 0 12px;
     }
-    .prose ul, .prose ol { margin: 0 0 18px; padding-left: 22px; }
+    .prose ul { margin: 0 0 18px; padding-left: 22px; }
     .prose li { margin-bottom: 6px; }
+    /* Ordered lists get a numbered "step badge" via a CSS counter instead of
+       the default 1. 2. 3. markers — reads as a sequence of steps, not a
+       bullet list that happens to be numbered. Only top-level items (ol > li)
+       are badged; nested lists fall back to defaults. */
+    .prose ol {
+      list-style: none;
+      counter-reset: step;
+      margin: 0 0 18px;
+      padding-left: 0;
+    }
+    .prose ol > li {
+      counter-increment: step;
+      position: relative;
+      padding-left: 40px;
+      margin-bottom: 12px;
+    }
+    .prose ol > li::before {
+      content: counter(step);
+      position: absolute;
+      left: 0;
+      top: 1px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 26px;
+      height: 26px;
+      border-radius: 50%;
+      background: var(--accent-light);
+      color: var(--accent-text);
+      font-family: "Google Sans", sans-serif;
+      font-size: 13px;
+      font-weight: 600;
+    }
     .prose a { color: var(--accent-text); }
     .prose strong { font-weight: 600; }
     .prose code {
