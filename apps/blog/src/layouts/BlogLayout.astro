@@ -15,6 +15,7 @@ interface Props {
   postStatus?: string;
 }
 const { title, description, postSlug, postStatus } = Astro.props;
+const gaId = import.meta.env.PUBLIC_GA_MEASUREMENT_ID;
 ---
 
 <!doctype html>
@@ -41,6 +42,41 @@ const { title, description, postSlug, postStatus } = Astro.props;
         document.documentElement.setAttribute("data-theme", isDark ? "dark" : "light");
       })();
     </script>
+    {
+      gaId && (
+        <script is:inline define:vars={{ gaId }}>
+          // Only the real production host reports — keeps local dev and Netlify
+          // deploy previews out of production analytics. The loader script itself
+          // is only injected here too, so non-prod hosts never even fetch it.
+          if (location.hostname === "blog.prasannavijayan.in") {
+            var loader = document.createElement("script");
+            loader.async = true;
+            loader.src = "https://www.googletagmanager.com/gtag/js?id=" + gaId;
+            document.head.appendChild(loader);
+
+            window.dataLayer = window.dataLayer || [];
+            function gtag() {
+              dataLayer.push(arguments);
+            }
+            gtag("js", new Date());
+            // send_page_view is off because swup swaps pages without a reload —
+            // the manual page_view below covers both first load and swup nav.
+            gtag("config", gaId, { send_page_view: false });
+
+            var sendPageView = function () {
+              gtag("event", "page_view", {
+                page_location: location.href,
+                page_title: document.title,
+              });
+            };
+            sendPageView();
+            // swup dispatches DOM CustomEvents prefixed "swup:" for each of its
+            // hooks — "page:view" fires once content has been swapped in.
+            document.addEventListener("swup:page:view", sendPageView);
+          }
+        </script>
+      )
+    }
   </head>
   <body data-post-slug={postSlug} data-post-status={postStatus}>
     <Header client:load />
