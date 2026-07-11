@@ -3,6 +3,15 @@
 @import "@pv/tokens/tailwind-theme.css";
 @source "../../../packages/ui/src";
 
+/* Always reserve the scrollbar's gutter, whether or not it's actually
+   needed. Without this, swapping in shorter/taller content (search results,
+   a tag filter) changes total page height enough to cross the scrollbar
+   threshold, and the whole centered layout jumps left/right by the
+   scrollbar's width — the "UI jitters" effect. */
+html {
+  scrollbar-gutter: stable;
+}
+
 /* Swup page transition (swup({ theme: false }) in astro.config.mjs) — the
  * leaving page sinks down + fades out, the entering page rises up + fades in.
  * Same two rules drive both directions: swup's `is-animating` class is what's
