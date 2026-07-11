@@ -27,6 +27,7 @@ const posts: PostSummary[] = allPosts.map((p) => ({
   attribution: p.data.attribution,
   reviewTook: p.data.reviewTook,
   timeToPublish: p.data.timeToPublish,
+  tags: p.data.tags,
 }));
 ---
 
@@ -36,6 +37,13 @@ const posts: PostSummary[] = allPosts.map((p) => ({
   </main>
 
   <style is:global>
+    /* Crossfade duration for the View Transition triggered from
+       BlogPostList.tsx on a tag click (Writing <-> tag-filtered view) —
+       short and subtle rather than the browser's default ~0.25s. */
+    ::view-transition-old(root),
+    ::view-transition-new(root) {
+      animation-duration: 0.18s;
+    }
     /* post-column (720) sits between the search panel and the aside (both 280 +
        32 gap) so it stays centered on the page — matching how the article is
        centered on the single-post page — instead of the aside pulling it
@@ -50,6 +58,7 @@ const posts: PostSummary[] = allPosts.map((p) => ({
       flex: 1;
       align-items: flex-start;
       gap: 32px;
+      width: 100%;
       max-width: 1344px;
       margin: 0 auto;
     }
@@ -149,6 +158,33 @@ const posts: PostSummary[] = allPosts.map((p) => ({
       font-weight: 400;
       color: var(--text-tertiary);
     }
+    /* Fills the space below the search input by default. Default look
+       matches .tag on the single-post page ([slug].astro); the active
+       (aria-pressed) look matches the soft-accent pill already used by
+       .pinned-label/.provenance-badge elsewhere on this page. */
+    .tag-cloud {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      margin-top: 14px;
+    }
+    .tag-chip {
+      font: inherit;
+      font-size: 11px;
+      color: var(--text-secondary);
+      background: var(--bg-tertiary);
+      border: 1px solid transparent;
+      padding: 4px 11px;
+      border-radius: 20px;
+      cursor: pointer;
+      transition: background 0.15s, border-color 0.15s, color 0.15s;
+    }
+    .tag-chip:hover { border-color: var(--border); }
+    .tag-chip[aria-pressed="true"] {
+      color: var(--accent-text);
+      background: var(--accent-light);
+      border-color: var(--accent);
+    }
     .post-column {
       flex: 1 1 auto;
       width: 100%;
@@ -158,6 +194,15 @@ const posts: PostSummary[] = allPosts.map((p) => ({
     /* Mobile-only full takeover of .post-column (hidden on desktop below —
        desktop keeps Writing showing and uses the dropdown above instead). */
     .mobile-search-results { display: none; }
+    /* Tag-filter takeover — unlike the mobile-only search takeover above,
+       this is NOT media-query-gated: a tag click is a discrete action (not
+       live-typing), so it hides Writing on every viewport. Pinned stays
+       visible throughout — it's excluded from the tag cloud/filter itself
+       (it's a curated highlight, not part of the searchable set) but the
+       card is a persistent fixture, not something filtering should hide. */
+    .tag-filtered-results { display: none; }
+    .post-column[data-tag-active] .tag-filtered-results { display: block; }
+    .post-column[data-tag-active] .default-listing { display: none; }
     .pinned-rail {
       position: sticky;
       flex: 0 0 280px;
@@ -222,6 +267,15 @@ const posts: PostSummary[] = allPosts.map((p) => ({
         align-self: stretch;
         order: -2;
         margin: 32px 20px 0;
+      }
+      /* The 720px cap is sized for the 3-column row layout (280 + gap + 720 +
+         gap + 280 = 1344) — in the stacked column layout it has no reason to
+         be narrower than .search-panel/.pinned-rail, whose own width just
+         comes from stretching minus their 20px side margins. Without this,
+         post cards fall short of the search box/pinned card's width below
+         ~1344px, and the gap grows the narrower the viewport gets. */
+      .post-column {
+        max-width: none;
       }
       /* Mobile search is a full takeover, not the desktop dropdown: hide it
          here, and — while actively searching — hide Writing and Pinned so

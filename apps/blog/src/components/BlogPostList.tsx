@@ -1,4 +1,27 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
+import { flushSync } from "react-dom";
+
+type DocumentWithViewTransitions = Document & {
+  startViewTransition: (callback: () => void) => void;
+};
+
+// Crossfades the DOM between two states using the View Transitions API
+// (Chrome/Edge/Safari) so the Writing <-> tag-filtered swap fades instead of
+// snapping. (Search intentionally does NOT use this — it read as too fuzzy
+// against the live-typing/debounce cadence.) flushSync forces the state
+// update to apply synchronously so the browser captures the *new* DOM for
+// the "after" snapshot — without it, startViewTransition would often
+// animate nothing, since React's batched update wouldn't have painted yet.
+// On browsers without support, this just runs the update directly —
+// progressive enhancement, not a hard dependency.
+function withViewTransition(update: () => void) {
+  const doc = typeof document !== "undefined" ? (document as DocumentWithViewTransitions) : null;
+  if (doc && typeof doc.startViewTransition === "function") {
+    doc.startViewTransition(() => flushSync(update));
+  } else {
+    update();
+  }
+}
 
 export type PostSummary = {
   id: string;
@@ -11,6 +34,7 @@ export type PostSummary = {
   attribution: string;
   reviewTook: string;
   timeToPublish: string;
+  tags: string[];
 };
 
 type Props = {
@@ -102,8 +126,12 @@ function PostListItem({ post }: { post: PostSummary }) {
 }
 
 export default function BlogPostList({ posts }: Props) {
-  const pinned = posts.find((p) => p.pinned);
-  const writing = posts.filter((p) => !p.pinned);
+  const pinned = useMemo(() => posts.find((p) => p.pinned), [posts]);
+  // Stable reference across renders (memoized on `posts`, not recomputed
+  // fresh every render) — it's a dependency of the search useEffect below,
+  // and an unstable array identity there would re-fire the search on every
+  // unrelated state change (e.g. clicking a tag chip).
+  const writing = useMemo(() => posts.filter((p) => !p.pinned), [posts]);
 
   const [query, setQuery] = useState("");
   const [debouncedQuery, setDebouncedQuery] = useState("");
@@ -111,6 +139,39 @@ export default function BlogPostList({ posts }: Props) {
   const [searching, setSearching] = useState(false);
   const [unavailable, setUnavailable] = useState(false);
   const pagefindRef = useRef<PagefindModule | null>(null);
+
+  // Tag cloud — every tag across `writing` (the pinned post is excluded from
+  // both the cloud and the tag filter — it's a curated highlight, not part
+  // of the searchable/browsable set), most-used first, ties broken
+  // alphabetically. Mutually exclusive with text search: picking a tag
+  // clears the query, and typing clears the active tag (see the two
+  // handlers below) — exactly one filter mode is ever active.
+  const [activeTag, setActiveTag] = useState<string | null>(null);
+  const tags = useMemo(() => {
+    const counts = new Map<string, number>();
+    for (const p of writing) {
+      for (const t of p.tags) counts.set(t, (counts.get(t) ?? 0) + 1);
+    }
+    return [...counts.entries()].sort(
+      ([aTag, aCount], [bTag, bCount]) => bCount - aCount || aTag.localeCompare(bTag),
+    ).map(([t]) => t);
+  }, [writing]);
+  const tagged = useMemo(
+    () => (activeTag ? writing.filter((p) => p.tags.includes(activeTag)) : []),
+    [writing, activeTag],
+  );
+
+  function handleTagClick(tag: string) {
+    withViewTransition(() => {
+      setActiveTag((current) => (current === tag ? null : tag));
+      // Clear both query and debouncedQuery directly (not just query) so
+      // isSearching drops immediately — otherwise the 200ms debounce would
+      // leave the search dropdown/results visible for a moment alongside
+      // the tag-filtered view.
+      setQuery("");
+      setDebouncedQuery("");
+    });
+  }
 
   useEffect(() => {
     const t = window.setTimeout(() => setDebouncedQuery(query.trim()), 200);
@@ -141,7 +202,9 @@ export default function BlogPostList({ posts }: Props) {
         for (const hit of hits) {
           const data = await hit.data();
           const slug = data.url.replace(/^\/|\/$/g, "");
-          const post = posts.find((p) => p.id === slug);
+          // writing (not posts) — the pinned post is excluded from search
+          // results, same as it's excluded from the tag cloud/tag filter.
+          const post = writing.find((p) => p.id === slug);
           if (post) matched.push(post);
         }
         if (!cancelled) setResults(matched);
@@ -154,7 +217,7 @@ export default function BlogPostList({ posts }: Props) {
     return () => {
       cancelled = true;
     };
-  }, [debouncedQuery, posts]);
+  }, [debouncedQuery, writing]);
 
   const isSearching = debouncedQuery.length > 0;
 
@@ -166,7 +229,10 @@ export default function BlogPostList({ posts }: Props) {
           className="search-input"
           placeholder="Search writing…"
           value={query}
-          onChange={(e) => setQuery(e.target.value)}
+          onChange={(e) => {
+            setQuery(e.target.value);
+            if (activeTag) setActiveTag(null); // typing overrides a tag filter
+          }}
           aria-label="Search writing"
         />
 
@@ -196,9 +262,34 @@ export default function BlogPostList({ posts }: Props) {
             )}
           </div>
         )}
+
+        {/* Fills the space below the input by default. Always rendered
+            (independent of search) so it's there whether or not the dropdown
+            above is open. A tag click is a discrete action, not live-typing,
+            so — unlike text search — it takes over .post-column on every
+            viewport, not just mobile (see data-tag-active below). */}
+        {tags.length > 0 && (
+          <div className="tag-cloud">
+            {tags.map((t) => (
+              <button
+                key={t}
+                type="button"
+                className="tag-chip"
+                aria-pressed={activeTag === t}
+                onClick={() => handleTagClick(t)}
+              >
+                {t}
+              </button>
+            ))}
+          </div>
+        )}
       </div>
 
-      <div className="post-column" data-searching={isSearching ? "" : undefined}>
+      <div
+        className="post-column"
+        data-searching={isSearching ? "" : undefined}
+        data-tag-active={activeTag ? "" : undefined}
+      >
         {/* Mobile-only full takeover: replaces Writing (and, via CSS
             sibling selector below, hides the pinned rail) so a mobile search
             shows only matches. Hidden on desktop via CSS — desktop relies on
@@ -234,6 +325,19 @@ export default function BlogPostList({ posts }: Props) {
             </ul>
           )}
         </div>
+
+        {/* A tag click takes over on every viewport (CSS below isn't
+            media-gated), unlike the mobile-only search takeover above. */}
+        {activeTag && (
+          <div className="tag-filtered-results">
+            <h1>Tagged "{activeTag}"</h1>
+            <ul className="post-list">
+              {tagged.map((p) => (
+                <PostListItem key={p.id} post={p} />
+              ))}
+            </ul>
+          </div>
+        )}
       </div>
 
       {pinned && (
